@@ -81,137 +81,132 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { FollowListService } from '@/app/services'
-import { mapGetters } from 'vuex'
+import { FollowList } from '@/interfaces'
+import { Ref, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { mapGetters, useStore } from 'vuex'
+import { notify } from '@kyvg/vue3-notification'
+import { actionNotify } from '../composables/notify'
+const router = useRouter()
+const mouseOverListId = ref(-1) // 我的关注 = 全部关注
+const mouseHoveringListId = ref(-1)
+const createListModalValue = ref('') // 创建分组的对话框的文本值
+const isCreateListModalVisible = ref(false) // 创建分组的显示状态
+const isCreateListModalSuccessLoading = ref(false) // 创建分组成功后的通知信息
+const renameListName = ref('') // 重命名列表的名称
+const renameListId = ref(0) // 重命名列表的id
+const isRenameListModalVisible = ref(false) // 重命名分组的显示状态
+const isRenameListModalSuccessLoading = ref(false) // 重命名分组成功后的通知
+let setMouseOverIdTimeout: NodeJS.Timeout | null = null
+const followLists = mapGetters(['followLists']).followLists() as Ref<FollowList[]>
+const followListService = new FollowListService()
 
-export default {
-  name: 'Follow',
-  data () {
-    return {
-      mouseOverListId: -1, // 我的关注 = 全部关注
-      setMouseOverIdTimeout: null,
-      mouseHoveringListId: -1,
-      createListModalValue: '', // 创建分组的对话框的文本值
-      isCreateListModalVisible: false, // 创建分组的显示状态
-      isCreateListModalSuccessLoading: false, // 创建分组成功后的通知信息
-      renameListName: '', // 重命名列表的名称
-      renameListId: 0, // 重命名列表的id
-      isRenameListModalVisible: false, // 重命名分组的显示状态
-      isRenameListModalSuccessLoading: false // 重命名分组成功后的通知
-    }
-  },
-  created () {
-    this.initService()
-  },
-  computed: {
-    ...mapGetters([
-      'followLists'
-    ])
-  },
-  methods: {
-    initService () {
-      this.followListService = new FollowListService()
-    },
-    mouseEnter (listId) {
-      if (this.setMouseOverIdTimeout) clearTimeout(this.setMouseOverIdTimeout)
-      this.mouseOverListId = listId
-    },
-    mouseLeave (listId) {
-      if (this.setMouseOverIdTimeout) clearTimeout(this.setMouseOverIdTimeout)
-      this.setMouseOverIdTimeout = setTimeout(() => {
-        this.mouseOverListId = -1
-        this.setMouseOverIdTimeout = null
-      }, 1000)
-    },
-    handleMouseHovering (listId) {
-      this.mouseHoveringListId = listId
-    },
-    handleMouseHoveringLeave (listId) {
-      this.mouseHoveringListId = -1
-    },
-    handleDeleteList (id) {
-      // get all follow list ids, then check whether include id that parameter passes
-      if (this.followLists.map((followList) => followList.id).includes(id)) {
-        this.followListService.deleteFollowList(id).subscribe((followLists) => {
-          this.$store.dispatch('updateFollowLists', followLists)
-          this.actionNotify('success', '分组删除成功。')
-          this.handleRouterChange()
-        })
-      }
-    },
-    showCreateListModal () {
-      this.createListModalValue = ''
-      this.isCreateListModalVisible = true
-    },
-    handleCreateListModalCancel () {
-      this.createListModalValue = ''
-      this.isCreateListModalVisible = false
-    },
-    handleCreateListModalSuccess () {
-      if (this.followLists.length >= 10) {
-        this.actionNotify('warn', '最多只能有十个分组。')
-        return
-      }
-      if (this.isEmpty(this.createListModalValue)) {
-        this.actionNotify('warn', '分组名字不能为空。')
-        return
-      }
-      if (this.createListModalValue.length > 20) {
-        this.actionNotify('warn', '分组名字过长，最多20个字符。')
-        return
-      }
-      if (this.followLists.map((followList) => followList.name).includes(this.createListModalValue)) {
-        this.actionNotify('warn', '分组名字重复')
-        return
-      }
-      this.isCreateListModalSuccessLoading = true
-      this.followListService.addFollowList(this.createListModalValue).subscribe((followLists) => {
-        this.$store.dispatch('updateFollowLists', followLists)
-        this.isCreateListModalSuccessLoading = false
-        this.isCreateListModalVisible = false
-        this.actionNotify('success', '分组创建成功。')
-        this.handleRouterChange()
+function handleRouterChange () {
+  // fix case NavigationDuplicated: Avoided redundant navigation to current location
+  const currentRoutePath = useRouter().currentRoute.value.path
+  if (!currentRoutePath.includes('-1')) {
+    useRouter().replace('/list/-1')
+  }
+}
+
+function isEmpty (str: string) {
+  return !str || str.trim().length === 0
+}
+
+function mouseEnter (listId: number) {
+  if (setMouseOverIdTimeout) clearTimeout(setMouseOverIdTimeout)
+  mouseOverListId.value = listId
+}
+
+function mouseLeave (listId: number) {
+  if (setMouseOverIdTimeout) clearTimeout(setMouseOverIdTimeout)
+  setMouseOverIdTimeout = setTimeout(() => {
+    mouseOverListId.value = -1
+    setMouseOverIdTimeout = null
+  }, 1000)
+}
+
+function handleMouseHovering (listId: number) {
+  mouseHoveringListId.value = listId
+}
+
+function handleMouseHoveringLeave (listId: number) {
+  mouseHoveringListId.value = -1
+}
+
+function handleDeleteList (id: number) {
+  if (followLists.value.map((followList) => followList.id).includes(id)) {
+    followListService.deleteFollowList(id).subscribe((followLists) => {
+      useStore().dispatch('updateFollowLists', followLists)
+      actionNotify('success', '分组删除成功。')
+      handleRouterChange()
+    })
+  }
+}
+
+function showCreateListModal () {
+  createListModalValue.value = ''
+  isCreateListModalVisible.value = true
+}
+
+function handleCreateListModalCancel () {
+  createListModalValue.value = ''
+  isCreateListModalVisible.value = false
+}
+function handleCreateListModalSuccess () {
+  if (followLists.value.length >= 10) {
+    actionNotify('warn', '最多只能有十个分组。')
+    return
+  }
+  if (isEmpty(createListModalValue.value)) {
+    actionNotify('warn', '分组名字不能为空。')
+    return
+  }
+  if (createListModalValue.value.length > 20) {
+    actionNotify('warn', '分组名字过长，最多20个字符。')
+    return
+  }
+  if (followLists.value.map((followList) => followList.name).includes(createListModalValue.value)) {
+    actionNotify('warn', '分组名字重复')
+    return
+  }
+  isCreateListModalSuccessLoading.value = true
+  followListService.addFollowList(createListModalValue.value).subscribe((followLists) => {
+    useStore().dispatch('updateFollowLists', followLists)
+    isCreateListModalSuccessLoading.value = false
+    isCreateListModalVisible.value = false
+    actionNotify('success', '分组创建成功。')
+    handleRouterChange()
+  })
+}
+
+function showRenameListModal (id: number, name: string) {
+  renameListId.value = id
+  renameListName.value = name
+  isRenameListModalVisible.value = true
+}
+
+function handleRenameListModalCancel () {
+  isRenameListModalVisible.value = false
+}
+
+function handleRenameListModalSuccess () {
+  if (renameListName.value.length <= 10) {
+    if (!followLists.value.map((followList) => followList.name).includes(renameListName.value)) {
+      isRenameListModalSuccessLoading.value = true
+      followListService.renameFollowList(renameListId.value, renameListName.value).subscribe((followLists) => {
+        useStore().dispatch('updateFollowLists', followLists)
+        isRenameListModalSuccessLoading.value = false
+        isRenameListModalVisible.value = false
+        actionNotify('success', '分组名字修改成功。')
       })
-    },
-    /**
-     * "", "    ", => true
-     */
-    isEmpty (str) {
-      return !str || str.trim().length === 0
-    },
-    showRenameListModal (id, name) {
-      this.renameListId = id
-      this.renameListName = name
-      this.isRenameListModalVisible = true
-    },
-    handleRouterChange () {
-      // fix case NavigationDuplicated: Avoided redundant navigation to current location
-      const currentRoutePath = this.$router.currentRoute.path
-      if (!currentRoutePath.includes('-1')) {
-        this.$router.replace('/list/-1')
-      }
-    },
-    handleRenameListModalCancel () {
-      this.isRenameListModalVisible = false
-    },
-    handleRenameListModalSuccess () {
-      if (this.renameListName.length <= 10) {
-        if (!this.followLists.map((followList) => followList.name).includes(this.renameListName)) {
-          this.isRenameListModalSuccessLoading = true
-          this.followListService.renameFollowList(this.renameListId, this.renameListName).subscribe((followLists) => {
-            this.$store.dispatch('updateFollowLists', followLists)
-            this.isRenameListModalSuccessLoading = false
-            this.isRenameListModalVisible = false
-            this.actionNotify('success', '分组名字修改成功。')
-          })
-        } else {
-          this.actionNotify('warn', '分组名字重复。')
-        }
-      } else {
-        this.actionNotify('warn', '分组名字过长。')
-      }
+    } else {
+      actionNotify('warn', '分组名字重复。')
     }
+  } else {
+    actionNotify('warn', '分组名字过长，最多10个字符。')
   }
 }
 </script>

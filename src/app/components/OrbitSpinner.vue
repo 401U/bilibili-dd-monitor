@@ -7,42 +7,31 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'OrbitSpinner',
-
-  props: {
-    animationDuration: {
-      type: Number,
-      default: 1000
-    },
-    size: {
-      type: Number,
-      default: 50
-    },
-    color: {
-      type: String,
-      default: '',
-      required: false
-    }
+<script setup lang=ts>
+import { computed, defineProps } from 'vue'
+const props = defineProps({
+  animationDuration: {
+    type: Number,
+    default: 1000
   },
-
-  computed: {
-    spinnerStyle () {
-      return {
-        height: `${this.size}px`,
-        width: `${this.size}px`
-      }
-    },
-
-    orbitStyle () {
-      return {
-        borderColor: this.color ? this.color : '',
-        animationDuration: `${this.animationDuration}ms`
-      }
-    }
+  size: {
+    type: Number,
+    default: 50
+  },
+  color: {
+    type: String,
+    default: '',
+    required: false
   }
-}
+})
+const spinnerStyle = computed(() => ({
+  height: `${props.size}px`,
+  width: `${props.size}px`
+}))
+const orbitStyle = computed(() => ({
+  borderColor: props.color ? props.color : '',
+  animationDuration: `${props.animationDuration}ms`
+}))
 </script>
 
 <style scoped>

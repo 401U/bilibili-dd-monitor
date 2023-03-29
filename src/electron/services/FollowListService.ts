@@ -1,6 +1,6 @@
 import { FollowList } from '@/interfaces'
 import settings from 'electron-settings'
-import { FollowListItem } from "@/interfaces/FollowList";
+import { FollowListItem } from '@/interfaces/FollowList'
 
 export class FollowListService {
   private static readonly FOLLOW_LISTS: string = 'followLists'
@@ -16,7 +16,7 @@ export class FollowListService {
         name: '默认分组',
         list: []
       }
-      settings.setSync(FollowListService.FOLLOW_LISTS, [defaultFollowList] as {})
+      settings.setSync(FollowListService.FOLLOW_LISTS, [defaultFollowList] as any)
     }
   }
 
@@ -38,7 +38,7 @@ export class FollowListService {
     const followListsNextId = followLists[followLists.length - 1].id + 1
     const newFollowList = {
       id: followListsNextId,
-      name: name,
+      name,
       list: [] // @deprecated ,use set. Don't use list
     }
     followLists.push(newFollowList)
@@ -94,7 +94,7 @@ export class FollowListService {
     let hasFollowedBefore = false
     // waring: this method can optimize performance by eager break
     followLists.forEach((followList: FollowList) => {
-      let mids = [...followList.list.map((item) => item.mid)]
+      const mids = [...followList.list.map((item) => item.mid)]
       const midIndex = mids.findIndex((listMid: number) => listMid === followListItem.mid)
       if (midIndex !== -1) {
         followList.list.splice(midIndex, 1)

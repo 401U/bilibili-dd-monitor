@@ -54,9 +54,9 @@ export default class SettingService {
     return new Observable<boolean>(this.sequenceSubscriber('getIsNotifiedOnStartReply'))
   }
 
-  getPathOfSettings (): Observable<boolean> {
+  getPathOfSettings (): Observable<string> {
     this.ipcRenderer.send('getPathOfSettings')
-    return new Observable<boolean>(this.sequenceSubscriber('getPathOfSettingsReply'))
+    return new Observable<string>(this.sequenceSubscriber('getPathOfSettingsReply'))
   }
 
   openPathOfSettings (): void {

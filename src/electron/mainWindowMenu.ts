@@ -58,20 +58,22 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
     }
   }
   const template = [
-    ...(process.platform === 'darwin' ? [{
-      label: app.getName(),
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    }] : []), {
+    ...(process.platform === 'darwin'
+      ? [{
+          label: app.getName(),
+          submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideothers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' }
+          ]
+        }]
+      : []), {
       label: '播放器',
       submenu: [
         {
@@ -96,6 +98,7 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             label: `显示器${index.toString()} ${display.size.width} X ${display.size.height}`,
             click: (() => {
               return autoSetPlayerBounds(display)
+              // eslint-disable-next-line @typescript-eslint/ban-types
             }) as Function
           } as MenuItem))
         },

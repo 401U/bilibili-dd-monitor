@@ -1,3 +1,8 @@
+interface LastLive {
+  online?: number; // 意义不明
+  time?: number; // 时间戳(毫秒) 例如1605880996178
+}
+
 /**
  * Vtuber 信息
  */
@@ -29,9 +34,4 @@ export interface VtbInfo {
   averageLive?: number; // @deprecated
   weekLive?: number; // @deprecated
   bot?: number; // @deprecated
-}
-
-interface LastLive {
-  online?: number; // 意义不明
-  time?: number; // 时间戳(毫秒) 例如1605880996178
 }

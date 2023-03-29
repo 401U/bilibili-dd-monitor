@@ -1,7 +1,7 @@
 const request = require('request')
 
-let roomid = 1603600
-let url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
+const roomid = 1603600
+const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
 request(url, function (error, response, body) {
   if (error) {
     console.error('error:', error) // Print the error if one occurred
@@ -27,9 +27,7 @@ request(url, function (error, response, body) {
       // maybe invalid roomid parameter
       console.log('invalid response')
     }
-
   }
-
 })
 
 console.log('log')

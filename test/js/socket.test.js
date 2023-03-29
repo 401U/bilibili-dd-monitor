@@ -42,7 +42,7 @@ socket.on('reconnecting', (attemptNumber) => {
   console.log('reconnecting')
 })
 
-socket.on('reconnect_error', (error) => {
+socket.on('reconnect_error', (_error) => {
   console.log('reconnect_error')
 })
 
@@ -50,7 +50,7 @@ socket.on('reconnect_failed', () => {
   console.log('reconnect_failed')
 })
 
-socket.on('connect_error', (error) => {
+socket.on('connect_error', (_error) => {
   console.log('connect_error')
 })
 
@@ -58,6 +58,6 @@ socket.on('connect_timeout', (timeout) => {
   console.log('connect_timeout')
 })
 
-socket.on('error', (error) => {
+socket.on('error', (_error) => {
   console.log('error')
 })

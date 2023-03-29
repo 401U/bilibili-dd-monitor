@@ -163,7 +163,7 @@ const initIpcMainListeners = () => {
 
         // player need `face`, `roomid`, `title`(optional) field
         const vtbInfoNeed = {
-          roomid: roomid,
+          roomid,
           title: (vtbInfo && vtbInfo.title) || '',
           face: (vtbInfo && vtbInfo.face) || ''
         }

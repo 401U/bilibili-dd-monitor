@@ -5,8 +5,8 @@ import vtbInfosMock from '../../../test/sample/VtbInfos.json'
 
 export class VtbInfoService {
   private vtbInfosMap: Map<number, VtbInfo> = new Map<number, VtbInfo>()
-  private update: Function | null = null
-  private _onceUpdate: Function | null = null
+  private update: ((infoPrev: VtbInfo[], infoNew: VtbInfo[], averageUpdateInterval: number) => any) | null = null
+  private _onceUpdate: ((info: VtbInfo[]) => any) | null = null
   private readonly socketIOUrl: string = ''
   // check this: https://github.com/socketio/socket.io-client/issues/1097 , can fix 503 error
   // if backend server uses a self signed certificate, need to config `rejectUnauthorized: false`.

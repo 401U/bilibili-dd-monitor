@@ -1,7 +1,7 @@
-import Vue from 'vue'
 import App from './app/App.vue'
 import router from './app/router'
 import store from './app/store'
+import { createApp } from 'vue'
 import {
   AppUpdateListener,
   CDNListener,
@@ -34,8 +34,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-// https://github.com/euvl/vue-notification/
-import Notifications from 'vue-notification'
+// https://github.com/euvl/vue3-notification/
+import Notifications, { notify } from '@kyvg/vue3-notification'
 import { FollowList } from '@/interfaces'
 
 import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
@@ -55,50 +55,34 @@ library.add(
   faPaperPlane,
   faHome
 )
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 
-Vue.component('v-select', vSelect)
-
-Vue.component('orbit-spinner', OrbitSpinner)
-
-Vue.config.productionTip = false
-
-Vue.use(Notifications)
-
-Vue.mixin({
-  methods: {
-    actionNotify: (type, text) => {
-      Vue.notify({
-        group: 'action-feedback',
-        // @ts-ignore
-        position: 'top',
-        duration: 1500,
-        type: type,
-        text: text
+const app = createApp(App)
+  .use(router)
+  .use(store)
+  .component('font-awesome-icon', FontAwesomeIcon)
+  .component('v-select', vSelect)
+  .component('orbit-spinner', OrbitSpinner)
+  .use(Notifications)
+  .mixin({
+    created () {
+      const noticeService = new NoticeListener()
+      slog('INIT', 'NoticeService')
+      const followListService = new FollowListService()
+      followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
+        slog('INIT', 'followlists')
+        store.dispatch('updateFollowLists', followLists)
       })
+      const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+      slog('INIT', 'VtbInfoUpdateListener')
+      const playerWindowCountListener = new PlayerWindowCountListener()
+      slog('INIT', 'PlayerWindowCountListener')
+      const cdnListener = new CDNListener()
+      slog('INIT', 'CDNListener')
+      const appUpdateListener = new AppUpdateListener()
+      slog('INIT', 'appUpdateListener')
     }
-  }
-})
+  })
 
-new Vue({
-  router,
-  store,
-  render: h => h(App),
-  created () {
-    const noticeService = new NoticeListener()
-    slog('INIT', 'NoticeService')
-    const followListService = new FollowListService()
-    followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
-      slog('INIT', 'followlists')
-      store.dispatch('updateFollowLists', followLists)
-    })
-    const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
-    slog('INIT', 'VtbInfoUpdateListener')
-    const playerWindowCountListener = new PlayerWindowCountListener()
-    slog('INIT', 'PlayerWindowCountListener')
-    const cdnListener = new CDNListener()
-    slog('INIT', 'CDNListener')
-    const appUpdateListener = new AppUpdateListener()
-    slog('INIT', 'appUpdateListener')
-  }
-}).$mount('#app')
+// app.config.productionTip = false
+
+app.mount('#app')

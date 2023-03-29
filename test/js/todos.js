@@ -1,3 +1,5 @@
+import { createApp } from 'vue'
+
 // Full spec-compliant TodoMVC with localStorage persistence
 // and hash-based routing in ~120 effective lines of JavaScript.
 
@@ -31,7 +33,7 @@ const filters = {
 }
 
 // app Vue instance
-const app = Vue.createApp({
+const app = createApp({
   // app initial state
   data () {
     return {

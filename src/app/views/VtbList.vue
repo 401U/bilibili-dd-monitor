@@ -111,7 +111,7 @@ export default {
     },
     toggleFollow (mid) {
       const followListItem = {
-        mid: mid,
+        mid,
         infoSource: 'DD_CENTER',
         updateMethod: 'AUTO'
       }

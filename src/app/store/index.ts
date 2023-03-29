@@ -1,10 +1,7 @@
-import Vue from 'vue'
 import Vuex from 'vuex'
 import { FollowList, VtbInfo } from '@/interfaces'
 import { UpdateInfo } from 'electron-updater'
 import { _compareByOnlineDesc } from '@/app/utils/helpers'
-
-Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
@@ -90,7 +87,7 @@ export default new Vuex.Store({
           // found => update existed object
           if (index !== -1) {
             // do better: sort and show diff parts
-            Vue.set(state.vtbInfos, index, newVtbInfo)
+            state.vtbInfos[index] = newVtbInfo
           } else {
             // not found, add this newVtbInfo to state.vtbInfos
             state.vtbInfos.push(newVtbInfo)

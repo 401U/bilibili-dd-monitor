@@ -133,7 +133,7 @@ Bilibili-dd-monitor是一个专为bilibili dd 设计的多屏观看vtuber直播�
 - vue 2.x | 前端视图框架
 - vuex | vue集中式状态管理
 - vue-router | vue页面路由导航
-- vue-notification | 第三方vue库，通知组件
+- vue3-notification | 第三方vue库，通知组件
 - vue-select | 第三方vue库，下拉框组件
 - vue-virtual-scroll-list | 第三方vue库，虚拟列表
 

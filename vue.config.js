@@ -67,7 +67,7 @@ module.exports = {
           installerHeaderIcon: winIconPath,
           createDesktopShortcut: true,
           createStartMenuShortcut: true,
-          shortcutName: shortcutName
+          shortcutName
         }
       }
     }

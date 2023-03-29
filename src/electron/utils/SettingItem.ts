@@ -1,4 +1,3 @@
-// @ts-ignore
 import storage from 'electron-json-storage'
 
 interface SettingItem {
@@ -18,7 +17,7 @@ function _printDataPath () {
 }
 
 function _getDemo () {
-  storage.get('foobar', function (error: any, data: {}) {
+  storage.get('foobar', function (error: any, data: object) {
     if (error) throw error
     console.log(data)// {}
   })

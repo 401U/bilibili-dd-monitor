@@ -9,7 +9,7 @@ declare const window: any
 
 export default class AppUpdateListener {
   private ipcRenderer: IpcRenderer
-  private store: Store<{}>;
+  private store: Store<object>
 
   constructor () {
     this.ipcRenderer = window.ipcRenderer

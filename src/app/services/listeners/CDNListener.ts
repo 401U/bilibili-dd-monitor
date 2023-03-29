@@ -6,7 +6,7 @@ declare const window: any
 
 export default class VtbInfoUpdateListener {
   private ipcRenderer: IpcRenderer
-  private store: Store<{}>;
+  private store: Store<object>
 
   constructor () {
     this.ipcRenderer = window.ipcRenderer

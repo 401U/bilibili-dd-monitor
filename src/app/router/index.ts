@@ -1,14 +1,10 @@
-import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
-import VtbLiving from '../views/VtbLiving.vue'
+import VueRouter from 'vue-router'
 
-Vue.use(VueRouter)
-
-const routes: Array<RouteConfig> = [
+const routes = [
   {
     path: '/',
     name: 'VtbLiving',
-    component: VtbLiving
+    component: () => import('../views/VtbLiving.vue')
   },
   {
     path: '/follow',
@@ -41,12 +37,17 @@ const routes: Array<RouteConfig> = [
   }
 ]
 
-const router = new VueRouter({
-  // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve
-  mode: process.env.IS_ELECTRON ? 'hash' : 'history',
-  base: process.env.BASE_URL,
-  routes,
-  linkActiveClass: '' // to fix home page class bug
+// const router = new VueRouter({
+//   // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve
+//   mode: process.env.IS_ELECTRON ? 'hash' : 'history',
+//   base: process.env.BASE_URL,
+//   routes,
+//   linkActiveClass: '' // to fix home page class bug
+// })
+
+const router = VueRouter.createRouter({
+  history: VueRouter.createWebHistory(),
+  routes
 })
 
 export default router

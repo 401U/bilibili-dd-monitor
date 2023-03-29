@@ -50,7 +50,7 @@
       <router-view/>
     </main>
 
-    <!-- for custom style: https://github.com/euvl/vue-notification#style-->
+    <!-- for custom style: https://github.com/euvl/vue3-notification#style-->
     <notifications group="action-feedback" position="top center"/>
 
     <!-- use v-if to make lazy compile-->
@@ -75,50 +75,76 @@
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
-import VueShield from '@/app/components/VueShield'
+<script setup lang="ts">
+import { mapGetters, useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import { ipcRenderer } from 'electron'
+// import VueShield from '@/app/components/VueShield'
 
-const ipcRenderer = window.ipcRenderer
+const mg = mapGetters([
+  'vtbCount',
+  'livingVtbCount',
+  'updateVtbCount',
+  'playerWindowCount',
+  'averageUpdateInterval',
+  'currentCDN',
+  'updateAvailableModalVisible',
+  'updateInfo'
+])
 
-export default {
-  data () {
-    return {}
-  },
-  components: {
-    VueShield
-  },
-  computed: {
-    ...mapGetters([
-      'vtbCount',
-      'livingVtbCount',
-      'updateVtbCount',
-      'playerWindowCount',
-      'averageUpdateInterval',
-      'currentCDN',
-      'updateAvailableModalVisible',
-      'updateInfo'
-    ])
-  },
-  methods: {
-    subIsActive (routePath) {
-      const paths = Array.isArray(routePath) ? routePath : [routePath]
-      return paths.some((path) => {
-        return this.$router.currentRoute.path.indexOf(path) !== -1
-      })
-    },
-    handleClickOK () {
-      // here should lock UI
-      this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
-      ipcRenderer.send('user-confirm-download')
-      // here should unlock UI
-      // (doge 这里更好的做法是锁UI，防止重复的快速点击
-    },
-    handleClickCancel () {
-      this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
-    }
-  }
+function subIsActive (routePath: string | string[]): boolean {
+  const paths = Array.isArray(routePath) ? routePath : [routePath]
+  return paths.some((path) => {
+    return useRouter().currentRoute.value.path.indexOf(path) !== -1
+  })
 }
+function handleClickOK () {
+  // here should lock UI
+  useStore().dispatch('toggleShowUpdateAvailableModal', mg.updateInfo)
+  ipcRenderer.send('user-confirm-download')
+  // here should unlock UI
+  // (doge 这里更好的做法是锁UI，防止重复的快速点击
+}
+function handleClickCancel () {
+  useStore().dispatch('toggleShowUpdateAvailableModal', mg.updateInfo)
+}
+
+// import VueShield from '@/app/components/VueShield'
+
+// const ipcRenderer = window.ipcRenderer
+
+// export default {
+//   computed: {
+//     ...mapGetters([
+//       'vtbCount',
+//       'livingVtbCount',
+//       'updateVtbCount',
+//       'playerWindowCount',
+//       'averageUpdateInterval',
+//       'currentCDN',
+//       'updateAvailableModalVisible',
+//       'updateInfo'
+//     ])
+//   },
+//   methods: {
+//     subIsActive (routePath) {
+//       const paths = Array.isArray(routePath) ? routePath : [routePath]
+//       return paths.some((path) => {
+//         return this.$router.currentRoute.path.indexOf(path) !== -1
+//       })
+//     },
+//     handleClickOK () {
+//       // here should lock UI
+//       this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
+//       ipcRenderer.send('user-confirm-download')
+//       // here should unlock UI
+//       // (doge 这里更好的做法是锁UI，防止重复的快速点击
+//     },
+//     handleClickCancel () {
+//       this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
+//     }
+//   }
+// }
 </script>
 
 <style lang="scss">
@@ -217,7 +243,7 @@ export default {
 }
 
 // override default style
-.vue-notification-group {
+.vue3-notification-group {
   top: 30% !important;
 }
 

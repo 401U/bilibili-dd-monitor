@@ -18,37 +18,29 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import SettingService from '@/app/services/SettingService'
+import { ref } from 'vue'
+const isNotifiedOnStart = ref(false)
+const settingsPath = ref('')
+const settingService = new SettingService()
 
-export default {
-  name: 'Setting',
-  data () {
-    return {
-      isNotifiedOnStart: false,
-      settingsPath: ''
-    }
-  },
-  created () {
-    this.settingService = new SettingService()
-    this.settingService.getIsNotifiedOnstart().subscribe((isNotifiedOnStart) => {
-      this.isNotifiedOnStart = isNotifiedOnStart
-    })
-    this.settingService.getPathOfSettings().subscribe((path) => {
-      this.settingsPath = path
-    })
-  },
-  methods: {
-    handleIsNotifiedOnStartChange () {
-      this.settingService.setIsNotifiedOnStart(!this.isNotifiedOnStart).subscribe((isNotifiedOnStart) => {
-        this.isNotifiedOnStart = isNotifiedOnStart
-      })
-    },
-    openSettingsPath () {
-      this.settingService.openPathOfSettings()
-    }
-  }
+function handleIsNotifiedOnStartChange () {
+  settingService.setIsNotifiedOnStart(!isNotifiedOnStart.value).subscribe((value) => {
+    isNotifiedOnStart.value = value
+  })
 }
+
+function openSettingsPath () {
+  settingService.openPathOfSettings()
+}
+
+settingService.getIsNotifiedOnstart().subscribe((value) => {
+  isNotifiedOnStart.value = value
+})
+settingService.getPathOfSettings().subscribe((path) => {
+  settingsPath.value = path
+})
 </script>
 
 <style scoped lang="scss">

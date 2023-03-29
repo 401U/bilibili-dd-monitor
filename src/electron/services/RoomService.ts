@@ -4,13 +4,14 @@ import request from 'request'
 function wrapRequest (url: string) {
   return new Promise((resolve, reject) => {
     request(url, (error, response, body) => {
-      if (error) reject(error);
+      if (error) reject(error)
       if (response.statusCode !== 200) {
-        reject('Invalid status code <' + response.statusCode + '>');
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject('Invalid status code <' + response.statusCode + '>')
       }
-      resolve(body);
-    });
-  });
+      resolve(body)
+    })
+  })
 }
 
 export class RoomService {
@@ -19,16 +20,16 @@ export class RoomService {
   }
 
   static async getInfoByRoom (roomid: number) {
-    let url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
+    const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
 
-    let result = {
+    const result = {
       isValid: false,
       info: {}
     }
 
     try {
-      const bodyString = await wrapRequest(url) as string;
-      const body = JSON.parse(bodyString);
+      const bodyString = await wrapRequest(url) as string
+      const body = JSON.parse(bodyString)
       const hasSuccessResponse = body && body.code === 0 && body.data
 
       if (hasSuccessResponse) {
@@ -43,23 +44,20 @@ export class RoomService {
 
         // console.log(mid, roomId, uname, face)
 
-        result.isValid = true;
+        result.isValid = true
         Object.assign(result.info, {
-          mid: mid,
-          roomid: roomid,
-          uname: uname,
-          face: face
+          mid,
+          roomid,
+          uname,
+          face
         })
-
       } else {
         // maybe invalid roomid parameter
-        console.log("invalid response")
+        console.log('invalid response')
       }
-
     } catch (e) {
     }
 
     return result
   }
-
 }

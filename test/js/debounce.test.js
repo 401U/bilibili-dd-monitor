@@ -4,7 +4,6 @@ const debounce = (fn, delayInMilliseconds) => {
     if (timeoutID) clearTimeout(timeoutID)
     // eslint-disable-next-line prefer-rest-params
     const args = arguments
-    // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this
     timeoutID = setTimeout(function () {
