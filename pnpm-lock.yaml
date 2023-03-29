@@ -19,6 +19,9 @@ dependencies:
   '@types/electron-json-storage':
     specifier: ^4.5.0
     version: 4.5.0
+  builder-util-runtime:
+    specifier: ^9.2.0
+    version: 9.2.0
   core-js:
     specifier: ^3.29.1
     version: 3.29.1
@@ -1202,7 +1205,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@types/node': 18.15.11
-      xmlbuilder: 11.0.1
+      xmlbuilder: 15.1.1
     dev: true
     optional: true
 
@@ -2026,6 +2029,16 @@ packages:
       sax: 1.2.4
     transitivePeerDependencies:
       - supports-color
+
+  /builder-util-runtime@9.2.0:
+    resolution: {integrity: sha512-6S0FLP5n57MgSVEypgjq5veUMd8C8NKt/IgRRXyYXYnhRG9AxxAB4/uULQhDG4JbAoeb5ahOTPC1jAxT0l2ylQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      debug: 4.3.4
+      sax: 1.2.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /builder-util@23.6.0:
     resolution: {integrity: sha512-QiQHweYsh8o+U/KNCZFSvISRnvRctb8m/2rB2I1JdByzvNKxPeFLlHFRPQRXab6aYeXc18j9LpsDLJ3sGQmWTQ==}

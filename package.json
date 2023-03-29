@@ -34,6 +34,7 @@
     "@fortawesome/vue-fontawesome": "~3.0.3",
     "@kyvg/vue3-notification": "^2.9.0",
     "@types/electron-json-storage": "^4.5.0",
+    "builder-util-runtime": "^9.2.0",
     "core-js": "^3.29.1",
     "electron-json-storage": "^4.6.0",
     "electron-settings": "^4.0.2",
