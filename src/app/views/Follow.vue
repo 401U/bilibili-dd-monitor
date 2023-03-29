@@ -99,7 +99,7 @@ const renameListName = ref('') // 重命名列表的名称
 const renameListId = ref(0) // 重命名列表的id
 const isRenameListModalVisible = ref(false) // 重命名分组的显示状态
 const isRenameListModalSuccessLoading = ref(false) // 重命名分组成功后的通知
-let setMouseOverIdTimeout: NodeJS.Timeout | null = null
+let setMouseOverIdTimeout: ReturnType<typeof setTimeout> | null = null
 const followLists = mapGetters(['followLists']).followLists() as Ref<FollowList[]>
 const followListService = new FollowListService()
 
