@@ -30,99 +30,100 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { LivePlayService, SearchHistoryService, RoomService, FollowListService } from '@/app/services'
-import { mapGetters } from 'vuex'
+import { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
+import { computed, ComputedRef, defineComponent, ref, Ref } from 'vue'
+import { useStore } from 'vuex'
+import { actionNotify } from '../composables/notify'
 
-export default {
-  name: 'LiveRoomEntry',
-  data () {
-    return {
-      searchRoomId: null,
-      searchHistory: []
+defineComponent({
+  name: 'LiveRoomEntry'
+})
+
+const searchRoomId = ref(-1)
+const searchHistory: Ref<SearchHistoryItem[]> = ref([])
+const followedVtbMids: ComputedRef<string[]> = computed(() => useStore().getters.followedVtbMids)
+let livePlayService: LivePlayService
+let searchHistoryService: SearchHistoryService
+let followListService: FollowListService
+let roomService: RoomService
+
+function initServices () {
+  livePlayService = new LivePlayService()
+  searchHistoryService = new SearchHistoryService()
+  followListService = new FollowListService()
+  roomService = new RoomService()
+}
+function initData () {
+  searchHistory.value = searchHistoryService.get()
+}
+function searchRoom () {
+  // validate user input
+  if (searchRoomId.value === -1) {
+    actionNotify('warn', '直播房间号不能为空')
+    return
+  }
+
+  // check whether this roomid is valid
+  roomService.getInfoByRoom(searchRoomId.value).subscribe((result) => {
+    // check validation
+    if (!result.isValid) {
+      actionNotify('error', `根据直播房间号${searchRoomId.value}查询信息失败`)
+      return
     }
-  },
-  created () {
-    this.initServices()
-    this.initData()
-  },
-  computed: {
-    ...mapGetters([
-      'followedVtbMids'
-    ])
-  },
-  methods: {
-    initServices () {
-      this.livePlayService = new LivePlayService()
-      this.searchHistoryService = new SearchHistoryService()
-      this.followListService = new FollowListService()
-      this.roomService = new RoomService()
-    },
-    initData () {
-      this.searchHistory = this.searchHistoryService.get()
-    },
-    searchRoom () {
-      // validate user input
-      if (!this.searchRoomId) {
-        this.actionNotify('warn', '直播房间号不能为空')
-        return
-      }
 
-      // check whether this roomid is valid
-      this.roomService.getInfoByRoom(this.searchRoomId).subscribe((result) => {
-        // check validation
-        if (!result.isValid) {
-          this.actionNotify('error', `根据直播房间号${this.searchRoomId}查询信息失败`)
-          return
-        }
+    // temporarily save searchRoomId(valid)
+    const roomIdCopy = searchRoomId
 
-        // temporarily save this.searchRoomId(valid)
-        const roomIdCopy = this.searchRoomId
-
-        // add search history item
-        const addFeedback = this.searchHistoryService.add(result.info)
-        if (addFeedback) {
-          this.searchHistory = this.searchHistoryService.get()
-          // finally, reset input
-          this.searchRoomId = null
-        } else {
-          this.actionNotify('warn', '添加历史记录失败，请重试')
-        }
-
-        // open player
-        this.enterRoom(roomIdCopy)
-      })
-    },
-    removeSearchHistoryItem (roomId) {
-      const removeSearchHistoryItemFeedback = this.searchHistoryService.remove(roomId)
-      if (removeSearchHistoryItemFeedback) {
-        this.searchHistory = this.searchHistoryService.get()
-      } else {
-        this.actionNotify('warn', '删除历史记录失败，请重试')
-      }
-    },
-    clearSearchHistory () {
-      this.searchHistoryService.clear()
-    },
-    followUser (info) {
-      const followListItem = {
-        mid: info.mid,
-        infoSource: 'BILIBILI',
-        updateMethod: 'MANUAL',
-        face: info.face,
-        uname: info.uname,
-        roomid: info.roomid,
-        sign: '==【该关注用户通过手动模式添加：简介暂时无法获取】=='
-      }
-      this.followListService.toggleFollow(followListItem).subscribe((followLists) => {
-        this.$store.dispatch('updateFollowLists', followLists)
-      })
-    },
-    enterRoom (roomId) {
-      this.livePlayService.enterRoom(roomId)
+    // add search history item
+    const addFeedback = searchHistoryService.add(result.info)
+    if (addFeedback) {
+      searchHistory.value = searchHistoryService.get()
+      // finally, reset input
+      searchRoomId.value = -1
+    } else {
+      actionNotify('warn', '添加历史记录失败，请重试')
     }
+
+    // open player
+    enterRoom(roomIdCopy.value)
+  })
+}
+
+function removeSearchHistoryItem (roomId: number) {
+  const removeSearchHistoryItemFeedback = searchHistoryService.remove(roomId)
+  if (removeSearchHistoryItemFeedback) {
+    searchHistory.value = searchHistoryService.get()
+  } else {
+    actionNotify('warn', '删除历史记录失败，请重试')
   }
 }
+
+function clearSearchHistory () {
+  searchHistoryService.clear()
+}
+
+function followUser (info: any) {
+  const followListItem = {
+    mid: info.mid,
+    infoSource: 'BILIBILI',
+    updateMethod: 'MANUAL',
+    face: info.face,
+    uname: info.uname,
+    roomid: info.roomid,
+    sign: '==【该关注用户通过手动模式添加：简介暂时无法获取】=='
+  }
+  followListService.toggleFollow(followListItem).subscribe((followLists) => {
+    useStore().dispatch('updateFollowLists', followLists)
+  })
+}
+function enterRoom (roomId: number) {
+  livePlayService.enterRoom(roomId)
+}
+
+initServices()
+initData()
 </script>
 
 <style scoped lang="scss">

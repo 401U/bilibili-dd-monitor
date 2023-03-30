@@ -37,7 +37,7 @@
         </td>
         <td class="living-list-body-cell">{{ showOnline(vtbInfo) }}</td>
         <td class="living-list-body-cell">{{ showTitle(vtbInfo) }}</td>
-        <td class="living-list-body-cell"><a @click="enterRoom(vtbInfo.roomid)" class="living-list-body-cell-enter-room">进入直播间</a></td>
+        <td class="living-list-body-cell"><a @click="enterRoom(vtbInfo.roomid!)" class="living-list-body-cell-enter-room">进入直播间</a></td>
       </tr>
       </tbody>
     </table>
@@ -51,46 +51,40 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { LivePlayService } from '@/app/services'
-import { mapGetters } from 'vuex'
+import { VtbInfo } from '@/interfaces'
+import { computed, ComputedRef, defineComponent } from 'vue'
+import { useStore } from 'vuex'
+let livePlayService: LivePlayService
+defineComponent({
+  name: 'VtbLiving'
+})
 
-export default {
-  name: 'VtbLiving',
-  data () {
-    return {}
-  },
-  created () {
-    this.initServices()
-  },
-  computed: {
-    ...mapGetters([
-      'followedVtbInfos'
-    ])
-  },
-  methods: {
-    initServices () {
-      this.livePlayService = new LivePlayService()
-    },
-    enterRoom (roomid) {
-      this.livePlayService.enterRoom(roomid)
-    },
-    showOnline (vtbInfo) {
-      if ({}.hasOwnProperty.call(vtbInfo, 'online')) {
-        return vtbInfo.online ? vtbInfo.online : 0
-      } else {
-        return 'unknown'
-      }
-    },
-    showTitle (vtbInfo) {
-      if ({}.hasOwnProperty.call(vtbInfo, 'title')) {
-        return vtbInfo.title
-      } else {
-        return 'unknown'
-      }
-    }
+const followedVtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.followedVtbInfos)
+
+function initServices () {
+  livePlayService = new LivePlayService()
+}
+function enterRoom (roomid: number) {
+  livePlayService.enterRoom(roomid)
+}
+function showOnline (vtbInfo: VtbInfo) {
+  if ({}.hasOwnProperty.call(vtbInfo, 'online')) {
+    return vtbInfo.online ? vtbInfo.online : 0
+  } else {
+    return 'unknown'
   }
 }
+function showTitle (vtbInfo: VtbInfo) {
+  if ({}.hasOwnProperty.call(vtbInfo, 'title')) {
+    return vtbInfo.title
+  } else {
+    return 'unknown'
+  }
+}
+
+initServices()
 </script>
 
 <style scoped lang="scss">

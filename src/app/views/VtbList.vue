@@ -15,118 +15,123 @@
         </p>
       </div>
     </div>
-    <!--https://github.com/tangbc/vue-virtual-scroll-list/issues/237#issuecomment-641935872-->
-    <virtual-list style="height: 700px; overflow-y: auto;"
-                  :data-key="'mid'"
-                  :data-sources="filteredVtbInfos"
-                  :data-component="itemComponent"
-                  :extra-props="{ followedVtbMids, toggleFollow: toggleFollow, enterRoom:enterRoom }"
-    />
+    <DynamicScroller
+      :items="filteredVtbInfos"
+      style="height: 700px; overflow-y: auto;"
+    >
+      <template v-slot="{ item, index, active }">
+        <DynamicScrollerItem
+          :item="item"
+          :data-index="index"
+          :active="active"
+        >
+          <VtbListItem
+            :index="index"
+            :source="item"
+            :followedVtbMids="followedVtbMids"
+            :toggleFollow="toggleFollow"
+            :enterRoom="enterRoom"
+          />
+        </DynamicScrollerItem>
+      </template>
+    </DynamicScroller>
   </div>
 </template>
 
-<script>
-import VtbListItem from '@/app/components/VtbListItem'
-import VirtualList from 'vue-virtual-scroll-list'
+<script setup lang="ts">
+import VtbListItem from '@/app/components/VtbListItem.vue'
 import { FollowListService, LivePlayService } from '@/app/services/index'
-import { mapGetters } from 'vuex'
+import { useStore } from 'vuex'
 import _ from 'lodash'
 import { _compareByOnlineDesc } from '@/app/utils/helpers'
+import { computed, ComputedRef, defineComponent, Ref, ref, watch } from 'vue'
+import { VtbInfo } from '@/interfaces'
+import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 
-export default {
-  name: 'VtbList',
-  components: {
-    VirtualList
-  },
-  data () {
-    return {
-      itemComponent: VtbListItem,
-      searchInput: '',
-      searchInputIsDirty: false,
-      isSearchCalculating: false,
-      filteredVtbInfos: [],
-      showOnlineOnly: false
-    }
-  },
-  computed: {
-    searchIndicator: function () {
-      if (this.isSearchCalculating) {
-        return '⟳ 正在处理...'
-      } else if (this.searchInputIsDirty) {
-        return '⟳ 正在输入...'
-      } else {
-        return '✓ 处理完成。结果数：' + this.filteredVtbInfos.length
-      }
-    },
-    ...mapGetters([
-      'vtbInfos',
-      'followedVtbMids'
-    ])
-  },
-  watch: {
-    searchInput: function () {
-      this.searchInputIsDirty = true
-      this.computeSearch()
-    },
-    showOnlineOnly: function () {
-      this.searchInputIsDirty = true
-      this.computeSearch()
-    },
-    vtbInfos: function () {
-      this.searchVtbInfosByName(this.searchInput)
-    }
-  },
-  created () {
-    this.initService()
-    this.loadData()
-  },
-  methods: {
-    initService () {
-      this.followListService = new FollowListService()
-      this.livePlayService = new LivePlayService()
-    },
-    loadData () {
-      // trigger init search by ''
-      this.searchVtbInfosByName(this.searchInput)
-    },
-    computeSearch: _.debounce(function () {
-      this.isSearchCalculating = true
-      setTimeout(() => {
-        this.searchVtbInfosByName(this.searchInput)
-        this.isSearchCalculating = false
-        this.searchInputIsDirty = false
-      }, 200)
-    }, 500),
-    searchVtbInfosByName (name) {
-      const filteredByName = this.vtbInfos.filter((vtbInfo) => vtbInfo.uname?.includes(name))
+defineComponent({
+  name: 'VtbList'
+})
 
-      if (this.showOnlineOnly) {
-        this.filteredByOnlineState = filteredByName.filter((vtbInfo) => !!vtbInfo.liveStatus)
-      } else {
-        // noop for filteredByName
-        this.filteredByOnlineState = filteredByName
-      }
+const searchInput: Ref<string> = ref('')
+const searchInputIsDirty: Ref<boolean> = ref(false)
+const isSearchCalculating: Ref<boolean> = ref(false)
+const filteredVtbInfos: Ref<VtbInfo[]> = ref([])
+const showOnlineOnly: Ref<boolean> = ref(false)
+let followListService: FollowListService
+let livePlayService: LivePlayService
 
-      this.filteredVtbInfos = this.filteredByOnlineState.sort(_compareByOnlineDesc)
-    },
-    toggleFollow (mid) {
-      const followListItem = {
-        mid,
-        infoSource: 'DD_CENTER',
-        updateMethod: 'AUTO'
-      }
-      this.followListService.toggleFollow(followListItem).subscribe((followLists) => {
-        this.$store.dispatch('updateFollowLists', followLists)
-      })
-    },
-    enterRoom (roomid) {
-      this.livePlayService.enterRoom(roomid)
-    },
-    toggleOnlineOnly () {
-      this.showOnlineOnly = !this.showOnlineOnly
-    }
+const searchIndicator = computed(() => {
+  if (isSearchCalculating.value) {
+    return '⟳ 正在处理...'
+  } else if (searchInputIsDirty.value) {
+    return '⟳ 正在输入...'
+  } else {
+    return '✓ 处理完成。结果数：' + filteredVtbInfos.value.length
   }
+})
+
+const vtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.vtbInfos)
+const followedVtbMids = computed(() => useStore().getters.followedVtbMids)
+function initService () {
+  followListService = new FollowListService()
+  livePlayService = new LivePlayService()
 }
+
+function loadData () {
+  // trigger init search by ''
+  searchVtbInfosByName(searchInput.value)
+}
+const computeSearch = _.debounce(function () {
+  isSearchCalculating.value = true
+  setTimeout(() => {
+    searchVtbInfosByName(searchInput.value)
+    isSearchCalculating.value = false
+    searchInputIsDirty.value = false
+  }, 200)
+}, 500)
+function searchVtbInfosByName (name: string) {
+  const filteredByName = vtbInfos.value.filter((vtbInfo) => vtbInfo.uname?.includes(name))
+  let filteredByOnlineState
+  if (showOnlineOnly.value) {
+    filteredByOnlineState = filteredByName.filter((vtbInfo) => !!vtbInfo.liveStatus)
+  } else {
+    // noop for filteredByName
+    filteredByOnlineState = filteredByName
+  }
+
+  filteredVtbInfos.value = filteredByOnlineState.sort(_compareByOnlineDesc)
+}
+function toggleFollow (mid: number) {
+  const followListItem = {
+    mid,
+    infoSource: 'DD_CENTER',
+    updateMethod: 'AUTO'
+  }
+  followListService.toggleFollow(followListItem).subscribe((followLists) => {
+    useStore().dispatch('updateFollowLists', followLists)
+  })
+}
+function enterRoom (roomid: number) {
+  livePlayService.enterRoom(roomid)
+}
+function toggleOnlineOnly () {
+  showOnlineOnly.value = !showOnlineOnly.value
+}
+
+initService()
+loadData()
+
+watch(searchInput, () => {
+  searchInputIsDirty.value = true
+  computeSearch()
+})
+watch(showOnlineOnly, () => {
+  searchInputIsDirty.value = true
+  computeSearch()
+})
+watch(vtbInfos, () => {
+  searchVtbInfosByName(searchInput.value)
+})
 </script>
 
 <style scoped lang="scss">

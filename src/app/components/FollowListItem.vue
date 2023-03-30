@@ -17,35 +17,24 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'item-component',
-  props: {
-    index: { // index of current item
-      type: Number
-    },
-    source: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
-    toggleFollow: {
-      type: Function
-    },
-    enterRoom: {
-      type: Function
-    },
-    handleSetListModalShow: {
-      type: Function
-    }
-  },
-  methods: {
-    getSignCSSClass (source) {
-      const isManualSignInfo = source.updateMethod === 'MANUAL'
-      return isManualSignInfo ? 'manual-sign-warn' : ''
-    }
-  }
+<script setup lang="ts">
+import { defineComponent } from 'vue'
+
+defineComponent({
+  name: 'item-component'
+})
+
+const props = defineProps<{
+  index: number,
+  source: any,
+  toggleFollow:(mid: number) => void,
+  enterRoom: (roomId: number) => void,
+  handleSetListModalShow: (mid: number) => void
+}>()
+
+function getSignCSSClass (source: any) {
+  const isManualSignInfo = source.updateMethod === 'MANUAL'
+  return isManualSignInfo ? 'manual-sign-warn' : ''
 }
 </script>
 

@@ -2,6 +2,10 @@ import { IpcRenderer } from 'electron'
 import { Observable, Observer } from 'rxjs'
 
 declare const window: any
+type Result = {
+  isValid: boolean
+  info: object
+}
 
 export default class RoomService {
   private ipcRenderer: IpcRenderer
@@ -26,8 +30,8 @@ export default class RoomService {
     }
   }
 
-  getInfoByRoom (roomid: number): Observable<boolean> {
+  getInfoByRoom (roomid: number): Observable<Result> {
     this.ipcRenderer.send('getInfoByRoom', roomid)
-    return new Observable<boolean>(this.sequenceSubscriber('getInfoByRoomReply'))
+    return new Observable<Result>(this.sequenceSubscriber('getInfoByRoomReply'))
   }
 }

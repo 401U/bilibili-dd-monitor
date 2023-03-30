@@ -84,12 +84,10 @@
 <script setup lang="ts">
 import { FollowListService } from '@/app/services'
 import { FollowList } from '@/interfaces'
-import { Ref, ref } from 'vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { mapGetters, useStore } from 'vuex'
-import { notify } from '@kyvg/vue3-notification'
+import { useStore } from 'vuex'
 import { actionNotify } from '../composables/notify'
-const router = useRouter()
 const mouseOverListId = ref(-1) // 我的关注 = 全部关注
 const mouseHoveringListId = ref(-1)
 const createListModalValue = ref('') // 创建分组的对话框的文本值
@@ -100,7 +98,7 @@ const renameListId = ref(0) // 重命名列表的id
 const isRenameListModalVisible = ref(false) // 重命名分组的显示状态
 const isRenameListModalSuccessLoading = ref(false) // 重命名分组成功后的通知
 let setMouseOverIdTimeout: ReturnType<typeof setTimeout> | null = null
-const followLists = mapGetters(['followLists']).followLists() as Ref<FollowList[]>
+const followLists: ComputedRef<FollowList[]> = computed(() => useStore().getters.followLists)
 const followListService = new FollowListService()
 
 function handleRouterChange () {

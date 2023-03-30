@@ -25,42 +25,25 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'item-component',
-  props: {
-    index: { // index of current item
-      type: Number
-    },
-    source: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
-    followedVtbMids: {
-      type: Array,
-      default () {
-        return []
-      }
-    },
-    toggleFollow: {
-      type: Function
-    },
-    enterRoom: {
-      type: Function
-    }
-  },
-  data () {
-    return {}
-  },
-  computed: {
-    rank () {
-      const rank = this.index + 1
-      return rank < 10 ? '0' + rank : rank
-    }
-  }
-}
+<script setup lang="ts">
+import { computed, defineComponent } from 'vue'
+
+defineComponent({
+  name: 'item-component'
+})
+
+const props = defineProps<{
+  index: number,
+  source: any,
+  followedVtbMids: Array<number>,
+  toggleFollow:(mid: number) => void,
+  enterRoom: (roomId: number) => void
+}>()
+
+const rank = computed(() => {
+  const rank = props.index + 1
+  return rank < 10 ? '0' + rank : rank
+})
 </script>
 
 <style scoped lang="scss">

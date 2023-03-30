@@ -1,7 +1,7 @@
-import axios from 'axios'
+import fetch from 'node-fetch'
 const roomid = 1603600
 const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
-axios.get(url).then(response => {
+fetch(url).then(response => {
   if (response.status === 200) {
     const result = JSON.parse(response.data)
     const hasSuccessResponse = result && result.code === 0 && result.data

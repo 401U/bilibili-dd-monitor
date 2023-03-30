@@ -2,22 +2,24 @@ import { BrowserWindow, nativeImage } from 'electron'
 import fs from 'fs'
 import { join } from 'path'
 import { PlayerObj, VtbInfo } from '@/interfaces'
+import { promisify } from 'node:util'
+import { pipeline } from 'node:stream'
+import { createWriteStream } from 'node:fs'
 
-import axios from 'axios'
+import fetch from 'node-fetch'
 import ContextMap from '@/electron/utils/ContextMap'
+const streamPipeline = promisify(pipeline)
 
 const downloadAndSetWindowIcon = (vtbInfo: VtbInfo, tempPath: string, win: Electron.BrowserWindow) => {
   if (vtbInfo.face) {
-    axios.get('' + vtbInfo.face).then((response) => {
-      fs.writeFileSync(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`), response.data)
+    fetch('' + vtbInfo.face).then((response) => {
+      if (!response.ok) {
+        throw new Error('Invalid status code <' + response.status + '>')
+      }
+      streamPipeline(response.body, createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
     }).finally(() => {
       win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
     })
-    // request('' + vtbInfo.face)
-    //   .pipe(fs.createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
-    //   .on('close', () => {
-    //     win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
-    //   })
   }
 }
 

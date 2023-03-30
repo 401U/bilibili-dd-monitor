@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { mapGetters, useStore } from 'vuex'
+import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ipcRenderer } from 'electron'
 import VueShield from '@/app/components/VueShield.vue'

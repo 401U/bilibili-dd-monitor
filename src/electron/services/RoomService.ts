@@ -1,13 +1,13 @@
-import axios from 'axios'
+import fetch from 'node-fetch'
 
 // wrap in an promise
 function wrapRequest (url: string) {
   return new Promise((resolve, reject) => {
-    axios.get(url).then((response) => {
+    fetch(url).then((response) => {
       if (response.status !== 200) {
         reject(new Error('Invalid status code <' + response.status + '>'))
       }
-      resolve(response.data)
+      resolve(response.text())
     }).catch((error) => {
       reject(error)
     })
@@ -56,6 +56,7 @@ export class RoomService {
         console.log('invalid response')
       }
     } catch (e) {
+      console.log(e)
     }
 
     return result

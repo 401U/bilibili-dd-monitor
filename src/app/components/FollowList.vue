@@ -1,13 +1,26 @@
 <template>
   <div class="follow-vtb-list">
     <h3 class="follow-vtb-list-title">{{ activeFollowList.name }}</h3>
-
-    <virtual-list style="height: 700px; overflow-y: auto;"
-                  :data-key="'mid'"
-                  :data-sources="activeFollowedVtbInfos"
-                  :data-component="itemComponent"
-                  :extra-props="{toggleFollow: toggleFollow, enterRoom:enterRoom, handleSetListModalShow:handleSetListModalShow }"
-    />
+    <DynamicScroller
+      :items="activeFollowedVtbInfos"
+      style="height: 700px; overflow-y: auto;"
+    >
+      <template v-slot="{ item, index, active }">
+        <DynamicScrollerItem
+          :item="item"
+          :data-index="index"
+          :active="active"
+        >
+          <FollowListItem
+            :index="index"
+            :source="item"
+            :toggleFollow="toggleFollow"
+            :enterRoom="enterRoom"
+            :handleSetListModalShow="handleSetListModalShow"
+          />
+        </DynamicScrollerItem>
+      </template>
+    </DynamicScroller>
 
     <div v-show="isSetListModalVisible" id="modal-set-list" class="modal">
       <div class="modal-content">
@@ -20,7 +33,7 @@
           <span class="modal-close" @click="handleSetListModalCancel">×</span>
         </div>
         <div class="modal-body">
-          <v-select label="name" :options="followLists" v-model="selectedListId" :reduce="followList => followList.id"></v-select>
+          <v-select label="name" :options="followLists" v-model="selectedListId" :reduce="(followList: FollowList) => followList.id"></v-select>
         </div>
         <div class="modal-footer">
           <button class="modal-button modal-button-ok" @click="handleSetListModalSuccess">确定</button>
@@ -32,114 +45,106 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { FollowListService, LivePlayService } from '@/app/services'
-import { mapGetters } from 'vuex'
-import FollowListItem from '@/app/components/FollowListItem'
-import VirtualList from 'vue-virtual-scroll-list'
+import { useStore } from 'vuex'
+import FollowListItem from '@/app/components/FollowListItem.vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
+import { FollowList, VtbInfo } from '@/interfaces'
+import { actionNotify } from '../composables/notify'
+import { DynamicScroller } from 'vue-virtual-scroller'
 
-export default {
-  name: 'FollowList',
-  data () {
-    return {
-      itemComponent: FollowListItem,
-      followListService: null,
-      isSetListModalVisible: false,
-      selectedVtbInfo: null,
-      selectedListId: null,
-      isSetListModalSuccessLoading: false,
-      activeListId: -1 // - 1, 0,...
+let followListService: FollowListService
+let livePlayService: LivePlayService
+const isSetListModalVisible = ref(false)
+const selectedListId = ref(-1)
+const isSetListModalSuccessLoading = ref(false)
+const activeListId = ref(-1)
+const selectedVtbInfo: Ref<VtbInfo|undefined> = ref()
+
+const followLists: ComputedRef<Array<FollowList>> = computed(() => useStore().getters.followLists)
+const followedVtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.followedVtbInfos)
+
+const activeFollowList = computed(() => {
+  let activeFollowList = {} as FollowList
+  // handle "全部关注"
+  if (activeListId.value === -1) {
+    const allFollow: FollowList = {
+      id: -1,
+      name: '全部关注',
+      list: []
     }
-  },
-  computed: {
-    ...mapGetters([
-      'followLists',
-      'followedVtbInfos'
-    ]),
-    activeFollowList () {
-      let activeFollowList = {}
-      // handle "全部关注"
-      if (this.activeListId === -1) {
-        const allFollow = {
-          id: -1,
-          name: '全部关注',
-          list: []
-        }
-        this.followLists.forEach((followList) => allFollow.list.push(...followList.list))
-        activeFollowList = allFollow
-      } else {
-        // handle listId >=0
-        this.followLists.forEach((followList) => {
-          if (followList.id === this.activeListId) {
-            activeFollowList = followList
-          }
-        })
+    followLists.value.forEach((followList) => allFollow.list.push(...followList.list))
+    activeFollowList = allFollow
+  } else {
+    // handle listId >=0
+    followLists.value.forEach((followList) => {
+      if (followList.id === activeListId.value) {
+        activeFollowList = followList
       }
-      return activeFollowList
-    },
-    activeFollowedVtbInfos () {
-      const mids = [...this.activeFollowList.list.map((item) => item.mid)]
-      return this.followedVtbInfos.filter((vtbInfo) => mids.includes(vtbInfo.mid))
-    }
-  },
-  components: {
-    VirtualList
-  },
-  created () {
-    this.initServices()
-  },
-  beforeRouteUpdate (to, from, next) {
-    this.activeListId = parseInt(to.params.id)
-    next()
-  },
-  methods: {
-    initServices () {
-      this.followListService = new FollowListService()
-      this.livePlayService = new LivePlayService()
-    },
-    handleSetListModalShow (selectedMid) {
-      this.selectedVtbInfo = this.activeFollowedVtbInfos.find((vtbInfo) => vtbInfo.mid === selectedMid)
-      this.isSetListModalVisible = true
-    },
-    handleSetListModalCancel () {
-      this.selectVtbInfo = null
-      this.isSetListModalVisible = false
-    },
-    handleSetListModalSuccess () {
-      if (!this.isValidListId(this.selectedListId)) {
-        this.actionNotify('warn', '请选择分组。')
-        return
-      }
-      this.isSetListModalSuccessLoading = true
-      const followListItem = {
-        mid: this.selectedVtbInfo.mid,
-        infoSource: 'DD_CENTER',
-        updateMethod: 'AUTO'
-      }
-      this.followListService.addItemsToFollowList([followListItem], this.selectedListId).subscribe((followLists) => {
-        this.isSetListModalSuccessLoading = false
-        this.isSetListModalVisible = false
-        this.actionNotify('success', '设置成功。')
-        this.$store.dispatch('updateFollowLists', followLists)
-      })
-    },
-    isValidListId (listId) {
-      return listId !== null && listId !== undefined
-    },
-    getActiveFollowListItem (mid) {
-      return this.activeFollowList.list.filter((item) => item.mid === mid)
-    },
-    toggleFollow (mid) {
-      const activeFollowListItem = this.getActiveFollowListItem(mid)[0]
-      this.followListService.toggleFollow(activeFollowListItem).subscribe((followLists) => {
-        this.$store.dispatch('updateFollowLists', followLists)
-      })
-    },
-    enterRoom (roomid) {
-      this.livePlayService.enterRoom(roomid)
-    }
+    })
   }
+  return activeFollowList
+})
+
+const activeFollowedVtbInfos = computed(() => {
+  const mids = [...activeFollowList.value.list.map((item) => item.mid)]
+  return followedVtbInfos.value.filter((vtbInfo) => mids.includes(vtbInfo.mid))
+})
+
+function initServices () {
+  followListService = new FollowListService()
+  livePlayService = new LivePlayService()
 }
+
+function handleSetListModalShow (selectedMid: number) {
+  selectedVtbInfo.value = activeFollowedVtbInfos.value.find((vtbInfo) => vtbInfo.mid === selectedMid)
+  isSetListModalVisible.value = true
+}
+
+function handleSetListModalCancel () {
+  selectedVtbInfo.value = undefined
+  isSetListModalVisible.value = false
+}
+function handleSetListModalSuccess () {
+  if (!isValidListId(selectedListId.value)) {
+    actionNotify('warn', '请选择分组。')
+    return
+  }
+  isSetListModalSuccessLoading.value = true
+  const followListItem = {
+    mid: selectedVtbInfo.value!.mid,
+    infoSource: 'DD_CENTER',
+    updateMethod: 'AUTO'
+  }
+  followListService.addItemsToFollowList([followListItem], selectedListId.value).subscribe((followLists) => {
+    isSetListModalSuccessLoading.value = false
+    isSetListModalVisible.value = false
+    actionNotify('success', '设置成功。')
+    useStore().dispatch('updateFollowLists', followLists)
+  })
+}
+
+function isValidListId (listId: number) {
+  return listId !== null && listId !== undefined
+}
+
+function getActiveFollowListItem (mid: number) {
+  return activeFollowList.value.list.filter((item) => item.mid === mid)
+}
+
+function toggleFollow (mid: number) {
+  const activeFollowListItem = getActiveFollowListItem(mid)[0]
+  followListService.toggleFollow(activeFollowListItem).subscribe((followLists) => {
+    useStore().dispatch('updateFollowLists', followLists)
+  })
+}
+
+function enterRoom (roomid: number) {
+  livePlayService.enterRoom(roomid)
+}
+
+initServices()
 </script>
 
 <style scoped lang="scss">

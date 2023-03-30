@@ -1,4 +1,4 @@
-import axios from 'axios'
+import fetch from 'node-fetch'
 // First, encapsulate into a Promise
 const roomid = 243244324
 const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
@@ -6,7 +6,7 @@ const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom
 // wrap in an promise
 function downloadPage (url) {
   return new Promise((resolve, reject) => {
-    axios.get(url).then((response) => {
+    fetch(url).then((response) => {
       if (response.status !== 200) {
         reject(new Error('Invalid status code <' + response.status + '>'))
       }
