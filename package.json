@@ -23,9 +23,14 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
-  "module": "src/background.ts",
+  "main": "dist-electron/main/index.js",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:5173/"
+    }
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "~6.4.0",

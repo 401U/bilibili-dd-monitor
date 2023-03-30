@@ -2,13 +2,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
-import pkg from './package.json'
 import path from 'path'
 
-export default defineConfig(({ command }) => {
-  const isServe = command === 'serve'
-  const isBuild = command === 'build'
-  const sourcemap = isServe || !!process.env.VSCODE_DEBUG
+export default defineConfig(() => {
   return {
     resolve: {
       alias: {
@@ -17,19 +13,24 @@ export default defineConfig(({ command }) => {
     },
     plugins: [
       vue(),
-      electron({
-        entry: 'src/electron/mainWindow.ts',
-        vite: {
-          build: {
-            sourcemap: sourcemap ? 'inline' : undefined,
-            minify: isBuild,
-            outDir: 'dist-electron/preload',
-            rollupOptions: {
-              external: Object.keys('dependencies' in pkg ? pkg.dependencies : {})
+      electron([
+        {
+          entry: 'src/electron/main/index.ts',
+          vite: {
+            build: {
+              outDir: 'dist-electron/main'
+            }
+          }
+        },
+        {
+          entry: 'src/electron/preload/index.js',
+          vite: {
+            build: {
+              outDir: 'dist-electron/preload'
             }
           }
         }
-      }),
+      ]),
       renderer()
     ],
     clearScreen: false

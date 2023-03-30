@@ -5,24 +5,16 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'vue-shield',
-  props: {
-    title: {
-      type: String,
-      default () {
-        return ''
-      }
-    },
-    content: {
-      type: [String, Number],
-      default () {
-        return ''
-      }
-    }
-  }
-}
+<script setup lang="ts">
+import { defineComponent, Ref } from 'vue'
+
+defineComponent({
+  name: 'vue-shield'
+})
+defineProps<{
+  title: string
+  content: string|number
+}>()
 </script>
 
 <style scoped lang="scss">

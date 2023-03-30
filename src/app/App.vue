@@ -79,9 +79,11 @@
 import { mapGetters, useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ipcRenderer } from 'electron'
-// import VueShield from '@/app/components/VueShield'
+import VueShield from '@/app/components/VueShield.vue'
+import { Ref } from 'vue'
+import { UpdateInfo } from 'electron-updater'
 
-const mg = mapGetters([
+const { vtbCount, livingVtbCount, updateVtbCount, playerWindowCount, averageUpdateInterval, currentCDN, updateAvailableModalVisible, updateInfo } = mapGetters([
   'vtbCount',
   'livingVtbCount',
   'updateVtbCount',
@@ -90,7 +92,16 @@ const mg = mapGetters([
   'currentCDN',
   'updateAvailableModalVisible',
   'updateInfo'
-])
+]) as unknown as {
+  vtbCount: Ref<number>
+  livingVtbCount: Ref<number>
+  updateVtbCount: Ref<number>
+  playerWindowCount: Ref<number>
+  averageUpdateInterval: Ref<number>
+  currentCDN: Ref<string>
+  updateAvailableModalVisible: Ref<boolean>
+  updateInfo: Ref<UpdateInfo>
+}
 
 function subIsActive (routePath: string | string[]): boolean {
   const paths = Array.isArray(routePath) ? routePath : [routePath]
@@ -100,51 +111,14 @@ function subIsActive (routePath: string | string[]): boolean {
 }
 function handleClickOK () {
   // here should lock UI
-  useStore().dispatch('toggleShowUpdateAvailableModal', mg.updateInfo)
+  useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
   ipcRenderer.send('user-confirm-download')
   // here should unlock UI
   // (doge 这里更好的做法是锁UI，防止重复的快速点击
 }
 function handleClickCancel () {
-  useStore().dispatch('toggleShowUpdateAvailableModal', mg.updateInfo)
+  useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
 }
-
-// import VueShield from '@/app/components/VueShield'
-
-// const ipcRenderer = window.ipcRenderer
-
-// export default {
-//   computed: {
-//     ...mapGetters([
-//       'vtbCount',
-//       'livingVtbCount',
-//       'updateVtbCount',
-//       'playerWindowCount',
-//       'averageUpdateInterval',
-//       'currentCDN',
-//       'updateAvailableModalVisible',
-//       'updateInfo'
-//     ])
-//   },
-//   methods: {
-//     subIsActive (routePath) {
-//       const paths = Array.isArray(routePath) ? routePath : [routePath]
-//       return paths.some((path) => {
-//         return this.$router.currentRoute.path.indexOf(path) !== -1
-//       })
-//     },
-//     handleClickOK () {
-//       // here should lock UI
-//       this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
-//       ipcRenderer.send('user-confirm-download')
-//       // here should unlock UI
-//       // (doge 这里更好的做法是锁UI，防止重复的快速点击
-//     },
-//     handleClickCancel () {
-//       this.$store.dispatch('toggleShowUpdateAvailableModal', this.updateInfo)
-//     }
-//   }
-// }
 </script>
 
 <style lang="scss">

@@ -1,17 +1,16 @@
 'use strict'
 
 import { app, protocol, BrowserWindow, ipcMain, IpcMainEvent, nativeImage, Tray, Menu } from 'electron'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import { configureSettings } from '@/electron/utils/OldGlobalSettings'
+import { configureSettings } from '../utils/OldGlobalSettings'
 import { autoUpdater } from 'electron-updater'
 
-import { FollowListService, SettingService, VtbInfoService, RoomService } from '@/electron/services'
+import { FollowListService, SettingService, VtbInfoService, RoomService } from '../services'
 import { FollowListItem, PlayerObj, VtbInfo } from '@/interfaces'
-import { createPlayerWindow } from '@/electron/playerWindow'
-import { createMainWindow } from '@/electron/mainWindow'
-import ContextMap from '@/electron/utils/ContextMap'
+import { createPlayerWindow } from '../playerWindow'
+import { createMainWindow } from '../mainWindow'
+import ContextMap from '../utils/ContextMap'
 import log from 'pretty-log'
-import CDN from '@/electron/utils/CDN'
+import CDN from '../utils/CDN'
 import path from 'path'
 
 let vtbInfosService: VtbInfoService
@@ -210,14 +209,23 @@ const mainWindowOnClosed = () => {
   }
 }
 
-let tray: Electron.Tray
+let tray: Electron.Tray | null = null
+
+async function initMainWindow () {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  const allWindows = BrowserWindow.getAllWindows()
+  if (allWindows.length) {
+    allWindows[0].focus()
+  } else {
+    mainWindow = await createMainWindow(app, playerObjMap)
+  }
+}
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // GC tray
-  if (tray) {
-    tray.destroy()
-  }
+  tray?.destroy()
 
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
@@ -226,24 +234,26 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', async () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    mainWindow = await createMainWindow(app, playerObjMap)
+app.on('second-instance', () => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.focus()
   }
 })
 
+app.on('activate', initMainWindow)
+
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    try {
-      await installExtension(VUEJS_DEVTOOLS)
-    } catch (e) {
-      console.error('Vue Devtools failed to install:', e.toString())
-    }
-  }
+  // if (isDevelopment && !process.env.IS_TEST) {
+  //   // Install Vue Devtools
+  //   try {
+  //     await installExtension(VUE_DEVTOOLS)
+  //   } catch (e) {
+  //     console.log(`Vue Devtools failed to install: ${e}`)
+  //   }
+  // }
 
   // pre setup
   initSettingsConfiguration()
@@ -257,7 +267,7 @@ app.on('ready', async () => {
   }
 
   initIpcMainListeners()
-  mainWindow = await createMainWindow(app, playerObjMap)
+  await initMainWindow()
   mainWindowOnClose()
   mainWindowOnClosed()
 
@@ -267,8 +277,8 @@ app.on('ready', async () => {
   // tray mode
   // development root folder: ./dist_electron/
   // prod root folder: ./dist_electron/bundled/
-  const iconPath = isDevelopment ? path.join(__dirname, './bundled/icon.png') : path.join(__dirname, './icon.png')
-  tray = new Tray(iconPath)
+  const iconPath = isDevelopment ? path.join(__dirname, '../../dist/icons/64x64.png') : path.join(__dirname, '../../icons/64x64.png')
+  if (!tray) tray = new Tray(iconPath)
 
   function showMainWindow () {
     if (!mainWindow.isVisible()) {
@@ -311,7 +321,7 @@ app.on('ready', async () => {
     app.quit()
   }
 
-  const trayMenu = Menu.buildFromTemplate([
+  const menuTemplate = [
     {
       label: '显示主界面',
       click: () => {
@@ -324,7 +334,18 @@ app.on('ready', async () => {
         quitApp()
       }
     }
-  ])
+  ]
+
+  if (process.env.VITE_DEV_SERVER_URL) {
+    menuTemplate.push({
+      label: 'DevTools',
+      click: () => {
+        mainWindow.webContents.openDevTools()
+      }
+    })
+  }
+
+  const trayMenu = Menu.buildFromTemplate(menuTemplate)
   tray.setToolTip('bilibili-dd-monitor')
   tray.setContextMenu(trayMenu)
   tray.on('click', () => {
