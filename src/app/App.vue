@@ -60,7 +60,6 @@
           <h3 class="modal-title">发现更新</h3>
         </div>
         <div class="modal-body">
-          <!-- .version undefined BUG-->
           <h4>新版本: {{ updateInfo && updateInfo.version }}. 是否立即下载？</h4>
           <p>更新内容</p>
           <p v-html="(updateInfo && updateInfo.releaseNotes)"></p>
@@ -80,28 +79,17 @@ import { mapGetters, useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ipcRenderer } from 'electron'
 import VueShield from '@/app/components/VueShield.vue'
-import { Ref } from 'vue'
+import { computed, ComputedRef, Ref } from 'vue'
 import { UpdateInfo } from 'electron-updater'
 
-const { vtbCount, livingVtbCount, updateVtbCount, playerWindowCount, averageUpdateInterval, currentCDN, updateAvailableModalVisible, updateInfo } = mapGetters([
-  'vtbCount',
-  'livingVtbCount',
-  'updateVtbCount',
-  'playerWindowCount',
-  'averageUpdateInterval',
-  'currentCDN',
-  'updateAvailableModalVisible',
-  'updateInfo'
-]) as unknown as {
-  vtbCount: Ref<number>
-  livingVtbCount: Ref<number>
-  updateVtbCount: Ref<number>
-  playerWindowCount: Ref<number>
-  averageUpdateInterval: Ref<number>
-  currentCDN: Ref<string>
-  updateAvailableModalVisible: Ref<boolean>
-  updateInfo: Ref<UpdateInfo>
-}
+const vtbCount: ComputedRef<number> = computed(() => useStore().getters.vtbCount)
+const livingVtbCount: ComputedRef<number> = computed(() => useStore().getters.livingVtbCount)
+const updateVtbCount: ComputedRef<number> = computed(() => useStore().getters.updateVtbCount)
+const playerWindowCount: ComputedRef<number> = computed(() => useStore().getters.playerWindowCount)
+const averageUpdateInterval: ComputedRef<number> = computed(() => useStore().getters.averageUpdateInterval)
+const currentCDN: ComputedRef<string> = computed(() => useStore().getters.currentCDN)
+const updateAvailableModalVisible: ComputedRef<boolean> = computed(() => useStore().getters.updateAvailableModalVisible)
+const updateInfo: ComputedRef<UpdateInfo> = computed(() => useStore().getters.updateInfo)
 
 function subIsActive (routePath: string | string[]): boolean {
   const paths = Array.isArray(routePath) ? routePath : [routePath]
@@ -112,7 +100,7 @@ function subIsActive (routePath: string | string[]): boolean {
 function handleClickOK () {
   // here should lock UI
   useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
-  ipcRenderer.send('user-confirm-download')
+  // ipcRenderer.send('user-confirm-download')
   // here should unlock UI
   // (doge 这里更好的做法是锁UI，防止重复的快速点击
 }

@@ -16,7 +16,7 @@ export default class CDN {
         }
       }
     } catch (e) {
-      console.error('PING CDN error: ', e.toString())
+      console.error(`PING CDN error: ${e}`)
     }
     // fallback cdn
     return 'https://api.vtbs.moe'

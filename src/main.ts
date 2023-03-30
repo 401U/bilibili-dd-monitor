@@ -63,25 +63,26 @@ const app = createApp(App)
   .component('v-select', vSelect)
   .component('orbit-spinner', OrbitSpinner)
   .use(Notifications)
-  .mixin({
-    created () {
-      const noticeService = new NoticeListener()
-      slog('INIT', 'NoticeService')
-      const followListService = new FollowListService()
-      followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
-        slog('INIT', 'followlists')
-        store.dispatch('updateFollowLists', followLists)
-      })
-      const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
-      slog('INIT', 'VtbInfoUpdateListener')
-      const playerWindowCountListener = new PlayerWindowCountListener()
-      slog('INIT', 'PlayerWindowCountListener')
-      const cdnListener = new CDNListener()
-      slog('INIT', 'CDNListener')
-      const appUpdateListener = new AppUpdateListener()
-      slog('INIT', 'appUpdateListener')
-    }
-  })
+
+app.mixin({
+  created () {
+    const noticeService = new NoticeListener()
+    slog('INIT', 'NoticeService')
+    const followListService = new FollowListService()
+    followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
+      slog('INIT', 'followlists')
+      store.dispatch('updateFollowLists', followLists)
+    })
+    const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+    slog('INIT', 'VtbInfoUpdateListener')
+    const playerWindowCountListener = new PlayerWindowCountListener()
+    slog('INIT', 'PlayerWindowCountListener')
+    const cdnListener = new CDNListener()
+    slog('INIT', 'CDNListener')
+    const appUpdateListener = new AppUpdateListener()
+    slog('INIT', 'appUpdateListener')
+  }
+})
 
 // app.config.productionTip = false
 
