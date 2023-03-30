@@ -1,15 +1,9 @@
-const request = require('request')
-
+import axios from 'axios'
 const roomid = 1603600
 const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
-request(url, function (error, response, body) {
-  if (error) {
-    console.error('error:', error) // Print the error if one occurred
-    return
-  }
-
-  if (response && response.statusCode === 200) {
-    const result = JSON.parse(body)
+axios.get(url).then(response => {
+  if (response.status === 200) {
+    const result = JSON.parse(response.data)
     const hasSuccessResponse = result && result.code === 0 && result.data
 
     if (hasSuccessResponse) {
@@ -28,6 +22,8 @@ request(url, function (error, response, body) {
       console.log('invalid response')
     }
   }
+}).catch(error => {
+  console.log(error)
 })
 
 console.log('log')

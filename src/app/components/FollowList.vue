@@ -35,7 +35,7 @@
 <script>
 import { FollowListService, LivePlayService } from '@/app/services'
 import { mapGetters } from 'vuex'
-import FollowListItem from './FollowListItem'
+import FollowListItem from '@/app/components/FollowListItem'
 import VirtualList from 'vue-virtual-scroll-list'
 
 export default {

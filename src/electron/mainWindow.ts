@@ -1,9 +1,8 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import path from 'path'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { PlayerObj } from '@/interfaces'
-import { createMainWindowMenu } from '@/electron/mainWindowMenu'
-import ContextMap from '@/electron/utils/ContextMap'
+import { createMainWindowMenu } from './mainWindowMenu'
+import ContextMap from './utils/ContextMap'
 
 const mainWindowIconPath = 'public/icons/icon.ico'
 
@@ -33,7 +32,7 @@ export const createMainWindow = async (app: Electron.App, playerObjMap: ContextM
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
-    createProtocol('app')
+    // createProtocol('app')
     // Load the index.html when not in development
     await win.loadURL('app://./index.html')
   }

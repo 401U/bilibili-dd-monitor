@@ -1,6 +1,6 @@
 import { dialog, Menu, MenuItem, screen, shell } from 'electron'
 import { PlayerObj } from '@/interfaces'
-import { checkForUpdates } from '@/electron/updater'
+import { checkForUpdates } from './updater'
 import ContextMap from '@/electron/utils/ContextMap'
 
 export const createMainWindowMenu = (app: Electron.App, players: ContextMap<number, PlayerObj>) => {
@@ -60,19 +60,19 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
   const template = [
     ...(process.platform === 'darwin'
       ? [{
-          label: app.getName(),
-          submenu: [
-            { role: 'about' },
-            { type: 'separator' },
-            { role: 'services' },
-            { type: 'separator' },
-            { role: 'hide' },
-            { role: 'hideothers' },
-            { role: 'unhide' },
-            { type: 'separator' },
-            { role: 'quit' }
-          ]
-        }]
+        label: app.getName(),
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideothers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' }
+        ]
+      }]
       : []), {
       label: '播放器',
       submenu: [

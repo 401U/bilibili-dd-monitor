@@ -3,16 +3,21 @@ import fs from 'fs'
 import { join } from 'path'
 import { PlayerObj, VtbInfo } from '@/interfaces'
 
-import request from 'request'
+import axios from 'axios'
 import ContextMap from '@/electron/utils/ContextMap'
 
 const downloadAndSetWindowIcon = (vtbInfo: VtbInfo, tempPath: string, win: Electron.BrowserWindow) => {
   if (vtbInfo.face) {
-    request('' + vtbInfo.face)
-      .pipe(fs.createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
-      .on('close', () => {
-        win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
-      })
+    axios.get('' + vtbInfo.face).then((response) => {
+      fs.writeFileSync(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`), response.data)
+    }).finally(() => {
+      win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
+    })
+    // request('' + vtbInfo.face)
+    //   .pipe(fs.createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
+    //   .on('close', () => {
+    //     win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
+    //   })
   }
 }
 

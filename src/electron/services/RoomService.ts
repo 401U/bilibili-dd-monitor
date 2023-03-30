@@ -1,15 +1,15 @@
-import request from 'request'
+import axios from 'axios'
 
-// wrap a request in an promise
+// wrap in an promise
 function wrapRequest (url: string) {
   return new Promise((resolve, reject) => {
-    request(url, (error, response, body) => {
-      if (error) reject(error)
-      if (response.statusCode !== 200) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject('Invalid status code <' + response.statusCode + '>')
+    axios.get(url).then((response) => {
+      if (response.status !== 200) {
+        reject(new Error('Invalid status code <' + response.status + '>'))
       }
-      resolve(body)
+      resolve(response.data)
+    }).catch((error) => {
+      reject(error)
     })
   })
 }
