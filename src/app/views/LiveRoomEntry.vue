@@ -5,7 +5,7 @@
       说明：该功能作为API不可用时，或者API尚未收录某些vtuber时的一种补充策略。
     </p>
     <div class="search">
-      <input class="search-input" v-model="searchRoomId" type="number" placeholder="直播房间号"/>
+      <input class="search-input" v-model="searchRoomId" type="number" placeholder="直播房间号" @keyup.enter="searchRoom" />
       <button class="search-button" @click="searchRoom">
         Go!
       </button>
@@ -41,7 +41,7 @@ defineComponent({
   name: 'LiveRoomEntry'
 })
 
-const searchRoomId = ref(-1)
+const searchRoomId = ref('')
 const searchHistory: Ref<SearchHistoryItem[]> = ref([])
 const followedVtbMids: ComputedRef<string[]> = computed(() => useStore().getters.followedVtbMids)
 let livePlayService: LivePlayService
@@ -60,13 +60,13 @@ function initData () {
 }
 function searchRoom () {
   // validate user input
-  if (searchRoomId.value === -1) {
+  if (searchRoomId.value === '') {
     actionNotify('warn', '直播房间号不能为空')
     return
   }
 
   // check whether this roomid is valid
-  roomService.getInfoByRoom(searchRoomId.value).subscribe((result) => {
+  roomService.getInfoByRoom(Number(searchRoomId.value)).subscribe((result) => {
     // check validation
     if (!result.isValid) {
       actionNotify('error', `根据直播房间号${searchRoomId.value}查询信息失败`)
@@ -81,13 +81,13 @@ function searchRoom () {
     if (addFeedback) {
       searchHistory.value = searchHistoryService.get()
       // finally, reset input
-      searchRoomId.value = -1
+      searchRoomId.value = ''
     } else {
       actionNotify('warn', '添加历史记录失败，请重试')
     }
 
     // open player
-    enterRoom(roomIdCopy.value)
+    enterRoom(Number(roomIdCopy.value))
   })
 }
 
