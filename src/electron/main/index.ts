@@ -9,7 +9,7 @@ import { FollowListItem, PlayerObj, VtbInfo } from '@/interfaces'
 import { createPlayerWindow } from '../playerWindow'
 import { createMainWindow } from '../mainWindow'
 import ContextMap from '../utils/ContextMap'
-import log from 'pretty-log'
+import { log } from '../utils/logger'
 import CDN from '../utils/CDN'
 import path from 'path'
 

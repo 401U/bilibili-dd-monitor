@@ -125,17 +125,17 @@ Bilibili-dd-monitor是一个专为bilibili dd 设计的多屏观看vtuber直播�
 - electron-json-storage | electron json配置工具库，暂时没有使用
 - lodash | JS实用库
 - ping | API健康监测
-- pretty-log | NodeJS环境下的控制台输出美化库
+- chalk | 控制台输出美化库
 - request | 网络请求库(过时)
 - rxjs | 异步和基于事件的通信工具
 - shields-log | 类似shields.io的浏览器控制台日志输出工具
 - socket.io-client | socket.io 客户端
-- vue 2.x | 前端视图框架
+- vue 3.x | 前端视图框架
 - vuex | vue集中式状态管理
 - vue-router | vue页面路由导航
 - vue3-notification | 第三方vue库，通知组件
 - vue-select | 第三方vue库，下拉框组件
-- vue-virtual-scroll-list | 第三方vue库，虚拟列表
+- vue-virtual-scroller | 第三方vue库，虚拟列表
 
 ## Versioning
 We use [SemVer](https://semver.org/lang/zh-CN/) for versioning. For the versions available, 
