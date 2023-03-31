@@ -85,7 +85,7 @@
 import { FollowListService } from '@/app/services'
 import { FollowList } from '@/interfaces'
 import { computed, ComputedRef, Ref, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { useStore } from 'vuex'
 import { actionNotify } from '../composables/notify'
 const mouseOverListId = ref(-1) // 我的关注 = 全部关注
