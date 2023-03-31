@@ -40,7 +40,8 @@ import { FollowList } from '@/interfaces'
 
 import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
 import { slog } from '@/app/utils/helpers'
-import { DynamicScroller } from 'vue-virtual-scroller'
+import VueVirtualScroller from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 library.add(
   faSignal,
@@ -60,7 +61,7 @@ library.add(
 const app = createApp(App)
   .use(router)
   .use(store)
-  .component('DynamicScroller', DynamicScroller)
+  .use(VueVirtualScroller)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('v-select', vSelect)
   .component('orbit-spinner', OrbitSpinner)

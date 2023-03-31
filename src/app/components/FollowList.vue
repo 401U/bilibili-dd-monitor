@@ -3,6 +3,8 @@
     <h3 class="follow-vtb-list-title">{{ activeFollowList.name }}</h3>
     <DynamicScroller
       :items="activeFollowedVtbInfos"
+      :min-item-size="20"
+      key-field="mid"
       style="height: 700px; overflow-y: auto;"
     >
       <template v-slot="{ item, index, active }">
@@ -10,6 +12,10 @@
           :item="item"
           :data-index="index"
           :active="active"
+          :size-dependencies="[
+            item.face,
+            item.sign
+          ]"
         >
           <FollowListItem
             :index="index"
@@ -52,7 +58,7 @@ import FollowListItem from '@/app/components/FollowListItem.vue'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { FollowList, VtbInfo } from '@/interfaces'
 import { actionNotify } from '../composables/notify'
-import { DynamicScroller } from 'vue-virtual-scroller'
+import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 
 let followListService: FollowListService
 let livePlayService: LivePlayService
@@ -148,6 +154,9 @@ initServices()
 </script>
 
 <style scoped lang="scss">
+.scroller {
+  height: 100%;
+}
 .follow-vtb-list {
   &-title {
     font-size: 1rem;

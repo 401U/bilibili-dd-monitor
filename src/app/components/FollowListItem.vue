@@ -1,7 +1,7 @@
 <template>
   <div :key="source.mid" class="virtual-list-item">
     <div class="virtual-list-item-media">
-      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face" alt=""/>
+      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face!" alt=""/>
       <div class="virtual-list-item-media-body">
         <h3 class="virtual-list-item-media-title">{{ source.uname }}</h3>
         <p class="virtual-list-item-media-content" :class="[getSignCSSClass(source)]">{{ source.sign }}</p>
@@ -9,7 +9,7 @@
       <div class="virtual-list-item-media-action">
         <a class="virtual-list-item-media-unfollow" @click="toggleFollow(source.mid)">取关</a>
         |
-        <a class="virtual-list-item-media-enter-room" @click="enterRoom(source.roomid)">进入直播间</a>
+        <a class="virtual-list-item-media-enter-room" @click="enterRoom(source.roomid!)">进入直播间</a>
         |
         <a class="virtual-list-item-media-set-list" @click="handleSetListModalShow(source.mid)">设置分组</a>
       </div>
@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { VtbInfo } from '@/interfaces'
 import { defineComponent } from 'vue'
 
 defineComponent({
@@ -26,7 +27,7 @@ defineComponent({
 
 const props = defineProps<{
   index: number,
-  source: any,
+  source: VtbInfo,
   toggleFollow:(mid: number) => void,
   enterRoom: (roomId: number) => void,
   handleSetListModalShow: (mid: number) => void
