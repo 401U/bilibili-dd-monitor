@@ -21,14 +21,6 @@ export default defineConfig(() => {
               outDir: 'dist-electron/main'
             }
           }
-        },
-        {
-          entry: 'src/electron/preload/index.js',
-          vite: {
-            build: {
-              outDir: 'dist-electron/preload'
-            }
-          }
         }
       ]),
       renderer()
