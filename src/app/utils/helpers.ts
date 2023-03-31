@@ -1,8 +1,8 @@
 import { VtbInfo } from '@/interfaces'
+import chalk from 'chalk'
 
-declare const window: any
 export const slog = (title: any, content: any): void => {
-  window.slog({ title, content })
+  console.log(chalk.inverse(chalk.blue(title)), content)
 }
 
 export const _compareByOnlineDesc = (vtbInfoA: VtbInfo, vtbInfoB: VtbInfo): number => {

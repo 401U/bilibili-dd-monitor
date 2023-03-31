@@ -125,35 +125,7 @@ use browser-level image lazy loading ability
 
 ## beautiful logging
 
-> web browser
-
-- shields-log
-
-该log适用于浏览器环境，不适用于NodeJS console。类似于shields.io 图标。
-
-> electron(NodeJS)
-
-- pretty
-
-当前使用pretty
-
-```
-[ERROR] => MESSAGE
-[WARN] => MESSAGE
-[SUCCESS] => MESSAGE
-[DEBUG] => MESSAGE
-```
-
-- cat-loggr
-
-```
- 12/10 15:05:33  verbose  Hello, world!
- 12/10 15:05:33   info    Hello, world!
- 12/10 15:05:33   init    Hello, world!
- 12/10 15:05:33   warn    Hello, world!
- 12/10 15:05:33   error   Hello, world!
- 12/10 15:05:33   fatal   Hello, world!
-```
+使用 [chalk](https://github.com/chalk/chalk) 来美化输出日志。
 
 ## measure electron app performance
 
