@@ -12,10 +12,6 @@
           :item="item"
           :data-index="index"
           :active="active"
-          :size-dependencies="[
-            item.face,
-            item.sign
-          ]"
         >
           <FollowListItem
             :index="index"

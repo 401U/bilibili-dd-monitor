@@ -17,7 +17,9 @@
     </div>
     <DynamicScroller
       :items="filteredVtbInfos"
-      style="height: 700px; overflow-y: auto;"
+      :min-item-size="20"
+      key-field="mid"
+      style="height: 800px; overflow-y: auto;"
     >
       <template v-slot="{ item, index, active }">
         <DynamicScrollerItem
