@@ -2,14 +2,6 @@ import App from './app/App.vue'
 import router from './app/router'
 import store from './app/store'
 import { createApp } from 'vue'
-import {
-  AppUpdateListener,
-  CDNListener,
-  FollowListService,
-  NoticeListener,
-  PlayerWindowCountListener,
-  VtbInfoUpdateListener
-} from '@/app/services'
 
 // import font awesome icon
 // https://github.com/FortAwesome/vue-fontawesome#installation
@@ -35,11 +27,9 @@ import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
 // https://github.com/euvl/vue3-notification/
-import Notifications, { notify } from '@kyvg/vue3-notification'
-import { FollowList } from '@/interfaces'
+import Notifications from '@kyvg/vue3-notification'
 
 import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
-import { slog } from '@/app/utils/helpers'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
