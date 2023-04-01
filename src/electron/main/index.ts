@@ -199,7 +199,6 @@ function mainWindowOnClose() {
   if (mainWindow) {
     // CLOSE
     mainWindow.on('close', (event) => {
-      log.debug('main window close.')
       mainWindow.hide()
       mainWindow.setSkipTaskbar(true)
       event.preventDefault()
@@ -218,18 +217,14 @@ function mainWindowOnClosed() {
 
 let tray: Electron.Tray | null = null
 
-function initMainWindow() {
+async function initMainWindow() {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   const allWindows = BrowserWindow.getAllWindows()
-  if (allWindows.length) {
+  if (allWindows.length)
     allWindows[0].focus()
-  }
-  else {
-    createMainWindow(app, playerObjMap)
-      .then(window => mainWindow = window)
-      .catch(err => log.error(JSON.stringify(err)))
-  }
+  else
+    mainWindow = await createMainWindow(app, playerObjMap)
 }
 
 // disable GPU
@@ -256,41 +251,35 @@ app.on('second-instance', () => {
   }
 })
 
-app.on('activate', initMainWindow)
+app.on('activate', () => {
+  initMainWindow().catch((error) => {
+    log.error(JSON.stringify(error))
+  })
+})
 
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  // if (isDevelopment && !process.env.IS_TEST) {
-  //   // Install Vue Devtools
-  //   try {
-  //     await installExtension(VUE_DEVTOOLS)
-  //   } catch (e) {
-  //     console.log(`Vue Devtools failed to install: ${e}`)
-  //   }
-  // }
-
   // pre setup
   initSettingsConfiguration()
 
-  // check if have alive cdn
-  CDN.getBestCDN()
-    .then((res) => {
-      bestCDN = res
-    }).catch((error) => {
-      log.error(JSON.stringify(error))
-    })
-  if (bestCDN)
-    log.debug(`Best CDN: ${bestCDN}`)
-  else
-    log.debug('No alive CDN')
-
   initIpcMainListeners()
-  initMainWindow()
+  initMainWindow().then(() => {
+    CDN.getBestCDN()
+      .then((res) => {
+        bestCDN = res
+        log.info(`Set CDN to: ${res}`)
+        // post setup
+        initServices()
+      }).catch((error) => {
+        log.error(JSON.stringify(error))
+      })
+    mainWindowOnClose()
+    mainWindowOnClosed()
+  }).catch((error) => {
+    log.error(JSON.stringify(error))
+  })
   mainWindowOnClose()
   mainWindowOnClosed()
-
-  // post setup
-  initServices()
 
   // tray mode
   // development root folder: ./dist_electron/
@@ -311,7 +300,6 @@ app.on('ready', () => {
     // 1.stop all services
     if (vtbInfosService)
       vtbInfosService.stopUpdate()
-    log.debug('1. Stop all services done.')
 
     // 2.close all player windows
     // NOTE: every close event of player window has been handled by itself
@@ -324,18 +312,15 @@ app.on('ready', () => {
       if (playerObj.playerWindow)
         playerObj.playerWindow.close()
     })
-    log.debug('2. Close all player windows done.')
 
     // 3.clear all ipcMain listeners
     ipcMain.removeAllListeners()
-    log.debug('3. Clear all ipcMain listeners done.')
 
     // 4.close main window
     // 强制关闭窗口, 除了closed之外，close，unload 和 beforeunload 都不会被触发
     // refer: https://www.electronjs.org/zh/docs/latest/api/browser-window#%E4%BA%8B%E4%BB%B6-close
     if (mainWindow)
       mainWindow.destroy()
-    log.debug('4. Close main window done.')
 
     // exit app
     app.quit()
