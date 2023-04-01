@@ -1,30 +1,25 @@
 'use strict'
 
-// import chalk from 'chalk'
+import chalk from 'chalk'
 
 export class log {
   static info (msg: string) {
-    // console.log(chalk.blue('INFO ') + msg)
-    console.log('INFO ' + msg)
+    console.log(chalk.blue('INFO '), msg)
   }
 
   static warn (msg: string) {
-    // console.log(chalk.yellow('WARN ') + msg)
-    console.log('WARN ' + msg)
+    console.log(chalk.yellow('WARN '), msg)
   }
 
   static error (msg: string) {
-    // console.log(chalk.red('ERROR ') + msg)
-    console.log('ERROR ' + msg)
+    console.log(chalk.inverse(chalk.red('ERROR ')), msg)
   }
 
   static debug (msg: string) {
-    // console.log(chalk.magenta('DEBUG ') + msg)
-    console.log('DEBUG ' + msg)
+    console.log(chalk.magenta('DEBUG '), msg)
   }
 
   static success (msg: string) {
-    // console.log(chalk.green('SUCCESS ') + msg)
-    console.log('SUCCESS ' + msg)
+    console.log(chalk.green('SUCCESS '), msg)
   }
 }
