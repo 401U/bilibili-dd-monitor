@@ -33,17 +33,18 @@
 <script setup lang="ts">
 import { LivePlayService, SearchHistoryService, RoomService, FollowListService } from '@/app/services'
 import { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
-import { computed, ComputedRef, defineComponent, ref, Ref } from 'vue'
-import { useStore } from 'vuex'
+import { computed, defineComponent, onMounted, ref, Ref } from 'vue'
 import { actionNotify } from '../composables/notify'
+import { usePiniaStore } from '../store'
 
 defineComponent({
   name: 'LiveRoomEntry'
 })
 
+const store = usePiniaStore()
 const searchRoomId = ref('')
 const searchHistory: Ref<SearchHistoryItem[]> = ref([])
-const followedVtbMids: ComputedRef<string[]> = computed(() => useStore().getters.followedVtbMids)
+const followedVtbMids = computed(() => store.followedVtbMids)
 let livePlayService: LivePlayService
 let searchHistoryService: SearchHistoryService
 let followListService: FollowListService
@@ -115,15 +116,17 @@ function followUser (info: any) {
     sign: '==【该关注用户通过手动模式添加：简介暂时无法获取】=='
   }
   followListService.toggleFollow(followListItem).subscribe((followLists) => {
-    useStore().dispatch('updateFollowLists', followLists)
+    store.followLists = followLists
   })
 }
 function enterRoom (roomId: number) {
   livePlayService.enterRoom(roomId)
 }
 
-initServices()
-initData()
+onMounted(() => {
+  initServices()
+  initData()
+})
 </script>
 
 <style scoped lang="scss">

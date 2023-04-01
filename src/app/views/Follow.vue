@@ -83,11 +83,11 @@
 
 <script setup lang="ts">
 import { FollowListService } from '@/app/services'
-import { FollowList } from '@/interfaces'
-import { computed, ComputedRef, Ref, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
-import { useStore } from 'vuex'
+import { usePiniaStore } from '@/app/store'
 import { actionNotify } from '../composables/notify'
+const store = usePiniaStore()
 const mouseOverListId = ref(-1) // 我的关注 = 全部关注
 const mouseHoveringListId = ref(-1)
 const createListModalValue = ref('') // 创建分组的对话框的文本值
@@ -98,7 +98,7 @@ const renameListId = ref(0) // 重命名列表的id
 const isRenameListModalVisible = ref(false) // 重命名分组的显示状态
 const isRenameListModalSuccessLoading = ref(false) // 重命名分组成功后的通知
 let setMouseOverIdTimeout: ReturnType<typeof setTimeout> | null = null
-const followLists: ComputedRef<FollowList[]> = computed(() => useStore().getters.followLists)
+const followLists = computed(() => store.followLists)
 const followListService = new FollowListService()
 
 function handleRouterChange () {
@@ -137,7 +137,7 @@ function handleMouseHoveringLeave (listId: number) {
 function handleDeleteList (id: number) {
   if (followLists.value.map((followList) => followList.id).includes(id)) {
     followListService.deleteFollowList(id).subscribe((followLists) => {
-      useStore().dispatch('updateFollowLists', followLists)
+      store.followLists = followLists
       actionNotify('success', '分组删除成功。')
       handleRouterChange()
     })
@@ -172,7 +172,7 @@ function handleCreateListModalSuccess () {
   }
   isCreateListModalSuccessLoading.value = true
   followListService.addFollowList(createListModalValue.value).subscribe((followLists) => {
-    useStore().dispatch('updateFollowLists', followLists)
+    store.followLists = followLists
     isCreateListModalSuccessLoading.value = false
     isCreateListModalVisible.value = false
     actionNotify('success', '分组创建成功。')
@@ -195,7 +195,7 @@ function handleRenameListModalSuccess () {
     if (!followLists.value.map((followList) => followList.name).includes(renameListName.value)) {
       isRenameListModalSuccessLoading.value = true
       followListService.renameFollowList(renameListId.value, renameListName.value).subscribe((followLists) => {
-        useStore().dispatch('updateFollowLists', followLists)
+        store.followLists = followLists
         isRenameListModalSuccessLoading.value = false
         isRenameListModalVisible.value = false
         actionNotify('success', '分组名字修改成功。')

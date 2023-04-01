@@ -49,23 +49,24 @@
 
 <script setup lang="ts">
 import { FollowListService, LivePlayService } from '@/app/services'
-import { useStore } from 'vuex'
+import { usePiniaStore } from '@/app/store'
 import FollowListItem from '@/app/components/FollowListItem.vue'
-import { computed, ComputedRef, Ref, ref } from 'vue'
+import { computed, Ref, ref } from 'vue'
 import { FollowList, VtbInfo } from '@/interfaces'
 import { actionNotify } from '../composables/notify'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 
 let followListService: FollowListService
 let livePlayService: LivePlayService
+const store = usePiniaStore()
 const isSetListModalVisible = ref(false)
 const selectedListId = ref(-1)
 const isSetListModalSuccessLoading = ref(false)
 const activeListId = ref(-1)
 const selectedVtbInfo: Ref<VtbInfo|undefined> = ref()
 
-const followLists: ComputedRef<Array<FollowList>> = computed(() => useStore().getters.followLists)
-const followedVtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.followedVtbInfos)
+const followLists = computed(() => store.followLists)
+const followedVtbInfos = computed(() => store.followedVtbInfos)
 
 const activeFollowList = computed(() => {
   let activeFollowList = {} as FollowList
@@ -123,7 +124,7 @@ function handleSetListModalSuccess () {
     isSetListModalSuccessLoading.value = false
     isSetListModalVisible.value = false
     actionNotify('success', '设置成功。')
-    useStore().dispatch('updateFollowLists', followLists)
+    store.followLists = followLists
   })
 }
 
@@ -138,7 +139,7 @@ function getActiveFollowListItem (mid: number) {
 function toggleFollow (mid: number) {
   const activeFollowListItem = getActiveFollowListItem(mid)[0]
   followListService.toggleFollow(activeFollowListItem).subscribe((followLists) => {
-    useStore().dispatch('updateFollowLists', followLists)
+    store.followLists = followLists
   })
 }
 
@@ -307,10 +308,6 @@ initServices()
 
   &-select {
     width: 100%;
-
-    &-option {
-
-    }
   }
 
   &-input {

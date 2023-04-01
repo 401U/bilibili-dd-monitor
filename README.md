@@ -130,7 +130,7 @@ Bilibili-dd-monitor是一个专为bilibili dd 设计的多屏观看vtuber直播�
 - rxjs | 异步和基于事件的通信工具
 - socket.io-client | socket.io 客户端
 - vue 3.x | 前端视图框架
-- vuex | vue集中式状态管理
+- pinia | vue集中式状态管理
 - vue-router | vue页面路由导航
 - vue3-notification | 第三方vue库，通知组件
 - vue-select | 第三方vue库，下拉框组件

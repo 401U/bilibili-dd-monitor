@@ -1,14 +1,13 @@
-import { Store, useStore } from 'vuex'
 import { UpdateInfo } from 'electron-updater'
 import { ProgressInfo } from 'builder-util-runtime'
 import { slog } from '@/app/utils/helpers'
-import store from '@/app/store'
+import { usePiniaStore } from '@/app/store'
 
 export default class AppUpdateListener {
-  private store: Store<object>
+  private store
 
   constructor () {
-    this.store = useStore()
+    this.store = usePiniaStore()
     this.initDownloadProgressListener()
     this.initUpdateAvailableListener()
   }
@@ -16,7 +15,7 @@ export default class AppUpdateListener {
   private initUpdateAvailableListener () {
     window.ipcRenderer.on('update-available', (event: Electron.Event, updateInfo: UpdateInfo) => {
       slog('update-available', updateInfo)
-      this.store.dispatch('toggleShowUpdateAvailableModal', updateInfo)
+      this.store.toggleShowUpdateAvailableModal(updateInfo)
     })
   }
 

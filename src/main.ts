@@ -1,6 +1,5 @@
-import App from './app/App.vue'
-import router from './app/router'
-import store from './app/store'
+import App from '@/app/App.vue'
+import router from '@/app/router'
 import { createApp } from 'vue'
 
 // import font awesome icon
@@ -32,6 +31,9 @@ import Notifications from '@kyvg/vue3-notification'
 import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { createPinia } from 'pinia'
+import { NoticeListener, FollowListService, VtbInfoUpdateListener, PlayerWindowCountListener, CDNListener, AppUpdateListener } from './app/services'
+import { slog } from './app/utils/helpers'
 
 library.add(
   faSignal,
@@ -48,9 +50,12 @@ library.add(
   faHome
 )
 
+const pinia = createPinia()
+
 const app = createApp(App)
   .use(router)
-  .use(store)
+  .use(pinia)
+  // .use(store, key)
   .use(VueVirtualScroller)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('v-select', vSelect)
@@ -60,3 +65,16 @@ const app = createApp(App)
 // app.config.productionTip = false
 
 app.mount('#app')
+  .$nextTick(() => {
+    const noticeService = new NoticeListener()
+    slog('INIT', 'NoticeService')
+    const followListService = new FollowListService()
+    const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+    slog('INIT', 'VtbInfoUpdateListener')
+    const playerWindowCountListener = new PlayerWindowCountListener()
+    slog('INIT', 'PlayerWindowCountListener')
+    const cdnListener = new CDNListener()
+    slog('INIT', 'CDNListener')
+    const appUpdateListener = new AppUpdateListener()
+    slog('INIT', 'appUpdateListener')
+  })

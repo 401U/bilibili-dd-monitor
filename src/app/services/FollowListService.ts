@@ -1,26 +1,23 @@
-import { IpcRenderer } from 'electron'
-import { Observable, Observer } from 'rxjs'
+import { Observable, Observer, TimeoutError } from 'rxjs'
 import { FollowList, FollowListItem } from '@/interfaces'
 import { slog } from '@/app/utils/helpers'
-import { Store, useStore } from 'vuex'
+import { usePiniaStore } from '@/app/store'
 
 /**
  * refactor to singleton
  */
 export default class FollowListService {
-  private ipcRenderer: IpcRenderer
-  private store: Store<any>
+  private store
 
   constructor () {
-    this.store = useStore()
-    this.ipcRenderer = window.ipcRenderer as IpcRenderer
+    this.store = usePiniaStore()
     this.initService()
   }
 
   initService () {
     this.getFollowLists().subscribe((followLists: FollowList[]) => {
       slog('INIT', 'followlists')
-      this.store.dispatch('updateFollowLists', followLists)
+      this.store.followLists = followLists
     })
   }
 
@@ -121,7 +118,7 @@ export default class FollowListService {
    * @param followListItem
    */
   toggleFollow (followListItem: FollowListItem): Observable<FollowList[]> {
-    window.ipcRenderer.send('toggleFollow', followListItem)
+    window.ipcRenderer.send('toggleFollow', JSON.stringify(followListItem))
     return new Observable<FollowList[]>(this.sequenceSubscriber('toggleFollowReply'))
   }
 

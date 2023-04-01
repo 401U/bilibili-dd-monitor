@@ -25,8 +25,8 @@ Vue切换路由时，
 更好的解决方案：
 
 - 初始化vtblist时，不触发任何到electron的数据请求
-- 将vtbInfos标记为计算属性，监控vuex的数据。如果vuex更新，那么页面自动会更新。 这样，只有第一次数据量较大，后续更新压力很小。
-- 创建 VtbInfoUpdateListener。专门监听后端数据更新，后端在数据更新时会使用IPC发送到前端， 前端触发actions，最终更新到vuex。
+- 将vtbInfos标记为计算属性，监控pinia的数据。如果pinia更新，那么页面自动会更新。 这样，只有第一次数据量较大，后续更新压力很小。
+- 创建 VtbInfoUpdateListener。专门监听后端数据更新，后端在数据更新时会使用IPC发送到前端， 前端触发actions，最终更新到pinia。
 
 ## input search performance improvement
 
@@ -47,53 +47,9 @@ Vue切换路由时，
 
 Vue 2.x 对数组mutation的监控能力非常有限，必须小心使用push,splice等已被拦截的方法，才能保证反应性。
 
-## Vuex vtbInfos data
+## pinia vtbInfos data
 
-### vuex
-
-```
-state: {
-  vtbInfos: [] as Array<VtbInfo>,
-  followLists: [] as Array<FollowList>,
-},
-```
-
-### init
-
-```
-followLists(vuex) 
-vtbInfos(vuex)
-followedVtbMid get from followLists(vuex)
-```
-
-### page
-
-- living
-
-```
-followedVtbInfos: followedVtbMids(followLists)(vuex) + vtbInfos(vuex) =>
-```
-
-- follow
-
-```
-followLists(vuex)
-```
-
-- followList
-
-```
-followLists(vuex)
-activeFollowList: local activeListId + followLists(vuex) =>
-activeFollowedVtbInfos: activeFollowList + vtbInfos(vuex) =>
-```   
-
-- vtbList
-
-```
-vtbInfos(vuex) => show long list
-followedVtbMids => show follow/unfollow
-```
+见 src/app/store
 
 ## image icons lazy loading
 

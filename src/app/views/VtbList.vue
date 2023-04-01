@@ -43,12 +43,12 @@
 <script setup lang="ts">
 import VtbListItem from '@/app/components/VtbListItem.vue'
 import { FollowListService, LivePlayService } from '@/app/services/index'
-import { useStore } from 'vuex'
 import _ from 'lodash'
 import { _compareByOnlineDesc } from '@/app/utils/helpers'
 import { computed, ComputedRef, defineComponent, Ref, ref, watch } from 'vue'
 import { VtbInfo } from '@/interfaces'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
+import { usePiniaStore } from '../store'
 
 defineComponent({
   name: 'VtbList'
@@ -72,8 +72,9 @@ const searchIndicator = computed(() => {
   }
 })
 
-const vtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.vtbInfos)
-const followedVtbMids = computed(() => useStore().getters.followedVtbMids)
+const store = usePiniaStore()
+const vtbInfos = computed(() => store.vtbInfos)
+const followedVtbMids = computed(() => store.followedVtbMids)
 function initService () {
   followListService = new FollowListService()
   livePlayService = new LivePlayService()
@@ -110,7 +111,7 @@ function toggleFollow (mid: number) {
     updateMethod: 'AUTO'
   }
   followListService.toggleFollow(followListItem).subscribe((followLists) => {
-    useStore().dispatch('updateFollowLists', followLists)
+    store.followLists = followLists
   })
 }
 function enterRoom (roomid: number) {

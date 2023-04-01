@@ -2,7 +2,7 @@
  * copy implementation of bilibili home page search
  */
 export interface SearchHistoryItem {
-  mid: string;
+  mid: number;
   roomid: number;
   face: string
   uname: string;

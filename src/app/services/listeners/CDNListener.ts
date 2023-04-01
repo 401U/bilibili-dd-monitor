@@ -1,17 +1,16 @@
-import store from '@/app/store'
-import { Store, useStore } from 'vuex'
+import { usePiniaStore } from '@/app/store'
 
 export default class VtbInfoUpdateListener {
-  private store: Store<object>
+  private store
 
   constructor () {
-    this.store = useStore()
+    this.store = usePiniaStore()
     this.initCurrentCDNListener()
   }
 
   initCurrentCDNListener () {
     window.ipcRenderer.on('updateCurrentCDN', (event: Electron.Event, currentCDN: string) => {
-      this.store.dispatch('updateCurrentCDN', currentCDN)
+      this.store.currentCDN = currentCDN
     })
   }
 }

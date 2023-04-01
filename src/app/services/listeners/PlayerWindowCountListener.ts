@@ -1,17 +1,16 @@
-import store from '@/app/store'
-import { Store, useStore } from 'vuex'
+import { usePiniaStore } from '@/app/store'
 
 export default class PlayerWindowCountListener {
-  private store: Store<object>
+  private store
 
   constructor () {
-    this.store = useStore()
+    this.store = usePiniaStore()
     this.initPlayerWindowCountListener()
   }
 
   initPlayerWindowCountListener () {
     window.ipcRenderer.on('updatePlayerWindowCount', (event: Electron.Event, count: number) => {
-      this.store.dispatch('updatePlayerWindowCount', count)
+      this.store.playerWindowCount = count
     })
   }
 }

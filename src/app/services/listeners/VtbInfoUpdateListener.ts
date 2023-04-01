@@ -1,18 +1,17 @@
-import store from '@/app/store'
+import { usePiniaStore } from '@/app/store'
 import { VtbInfo } from '@/interfaces'
-import { Store, useStore } from 'vuex'
 
 export default class VtbInfoUpdateListener {
-  private store: Store<object>
+  private store
 
   constructor () {
-    this.store = useStore()
+    this.store = usePiniaStore()
     this.initVtbInfosUpdateListener()
   }
 
   initVtbInfosUpdateListener () {
     window.ipcRenderer.on('updateVtbInfos', (event: Electron.Event, updatedVtbInfos: VtbInfo[], averageUpdateInterval: number) => {
-      this.store.dispatch('updateVtbInfos', { updatedVtbInfos, averageUpdateInterval })
+      this.store.updateVtbInfos(updatedVtbInfos, averageUpdateInterval)
     })
   }
 }

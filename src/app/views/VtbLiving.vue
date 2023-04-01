@@ -54,14 +54,14 @@
 <script setup lang="ts">
 import { LivePlayService } from '@/app/services'
 import { VtbInfo } from '@/interfaces'
-import { computed, ComputedRef, defineComponent } from 'vue'
-import { useStore } from 'vuex'
+import { computed, defineComponent } from 'vue'
+import { usePiniaStore } from '../store'
 let livePlayService: LivePlayService
 defineComponent({
   name: 'VtbLiving'
 })
 
-const followedVtbInfos: ComputedRef<VtbInfo[]> = computed(() => useStore().getters.followedVtbInfos)
+const followedVtbInfos = computed(() => usePiniaStore().followedVtbInfos)
 
 function initServices () {
   livePlayService = new LivePlayService()

@@ -75,24 +75,20 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import VueShield from '@/app/components/VueShield.vue'
-import { computed, ComputedRef, onMounted, Ref } from 'vue'
-import { UpdateInfo } from 'electron-updater'
-import { FollowList } from '@/interfaces'
-import { NoticeListener, FollowListService, VtbInfoUpdateListener, PlayerWindowCountListener, CDNListener, AppUpdateListener } from './services'
-import store from './store'
-import { slog } from './utils/helpers'
+import { computed } from 'vue'
+import { usePiniaStore } from './store'
+const store = usePiniaStore()
 
-const vtbCount: ComputedRef<number> = computed(() => useStore().getters.vtbCount)
-const livingVtbCount: ComputedRef<number> = computed(() => useStore().getters.livingVtbCount)
-const updateVtbCount: ComputedRef<number> = computed(() => useStore().getters.updateVtbCount)
-const playerWindowCount: ComputedRef<number> = computed(() => useStore().getters.playerWindowCount)
-const averageUpdateInterval: ComputedRef<number> = computed(() => useStore().getters.averageUpdateInterval)
-const currentCDN: ComputedRef<string> = computed(() => useStore().getters.currentCDN)
-const updateAvailableModalVisible: ComputedRef<boolean> = computed(() => useStore().getters.updateAvailableModalVisible)
-const updateInfo: ComputedRef<UpdateInfo> = computed(() => useStore().getters.updateInfo)
+const vtbCount = computed(() => store.vtbCount)
+const livingVtbCount = computed(() => store.livingVtbCount)
+const updateVtbCount = computed(() => store.updateVtbCount)
+const playerWindowCount = computed(() => store.playerWindowCount)
+const averageUpdateInterval = computed(() => store.averageUpdateInterval)
+const currentCDN = computed(() => store.currentCDN)
+const updateAvailableModalVisible = computed(() => store.updateAvailableModalVisible)
+const updateInfo = computed(() => store.updateInfo)
 
 function subIsActive (routePath: string | string[]): boolean {
   const paths = Array.isArray(routePath) ? routePath : [routePath]
@@ -102,28 +98,14 @@ function subIsActive (routePath: string | string[]): boolean {
 }
 function handleClickOK () {
   // here should lock UI
-  useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
+  store.toggleShowUpdateAvailableModal(updateInfo.value)
   // window.api.ipcRenderer.send('user-confirm-download')
   // here should unlock UI
   // (doge 这里更好的做法是锁UI，防止重复的快速点击
 }
 function handleClickCancel () {
-  useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
+  store.toggleShowUpdateAvailableModal(updateInfo.value)
 }
-
-onMounted(() => {
-  const noticeService = new NoticeListener()
-  slog('INIT', 'NoticeService')
-  const followListService = new FollowListService()
-  const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
-  slog('INIT', 'VtbInfoUpdateListener')
-  const playerWindowCountListener = new PlayerWindowCountListener()
-  slog('INIT', 'PlayerWindowCountListener')
-  const cdnListener = new CDNListener()
-  slog('INIT', 'CDNListener')
-  const appUpdateListener = new AppUpdateListener()
-  slog('INIT', 'appUpdateListener')
-})
 </script>
 
 <style lang="scss">
