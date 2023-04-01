@@ -10,18 +10,18 @@ export class SettingService {
   }
 
   static getIsNotifiedOnStartSync = (): boolean => {
-    if (!settings.hasSync(SettingService.IS_NOTIFIED_ON_START)) {
+    if (!settings.hasSync(SettingService.IS_NOTIFIED_ON_START))
       settings.setSync(SettingService.IS_NOTIFIED_ON_START, false)
-    }
+
     return settings.getSync(SettingService.IS_NOTIFIED_ON_START) as boolean
   }
 
-  static getPathOfSettings (): string {
+  static getPathOfSettings(): string {
     // in windows => C:\Users\{your-user-name}\AppData\Roaming\{app-name}\settings.json
-    return settings.file() as string
+    return settings.file()
   }
 
-  static openPathOfSettings (): void {
+  static openPathOfSettings(): void {
     shell.showItemInFolder(this.getPathOfSettings())
   }
 }

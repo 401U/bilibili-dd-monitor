@@ -1,38 +1,38 @@
-<!-- https://bit.dev/epicmaxco/epic-spinners/orbit-spinner/~code MIT license-->
-<template>
-  <div class="orbit-spinner" :style="spinnerStyle">
-    <div class="orbit one" :style="orbitStyle"></div>
-    <div class="orbit two" :style="orbitStyle"></div>
-    <div class="orbit three" :style="orbitStyle"></div>
-  </div>
-</template>
-
+<!-- https://bit.dev/epicmaxco/epic-spinners/orbit-spinner/~code MIT license -->
 <script setup lang=ts>
 import { computed } from 'vue'
 const props = defineProps({
   animationDuration: {
     type: Number,
-    default: 1000
+    default: 1000,
   },
   size: {
     type: Number,
-    default: 50
+    default: 50,
   },
   color: {
     type: String,
     default: '',
-    required: false
-  }
+    required: false,
+  },
 })
 const spinnerStyle = computed(() => ({
   height: `${props.size}px`,
-  width: `${props.size}px`
+  width: `${props.size}px`,
 }))
 const orbitStyle = computed(() => ({
   borderColor: props.color ? props.color : '',
-  animationDuration: `${props.animationDuration}ms`
+  animationDuration: `${props.animationDuration}ms`,
 }))
 </script>
+
+<template>
+  <div class="orbit-spinner" :style="spinnerStyle">
+    <div class="orbit one" :style="orbitStyle" />
+    <div class="orbit two" :style="orbitStyle" />
+    <div class="orbit three" :style="orbitStyle" />
+  </div>
+</template>
 
 <style scoped>
 .orbit-spinner, .orbit-spinner * {

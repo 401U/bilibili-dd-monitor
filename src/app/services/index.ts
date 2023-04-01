@@ -20,5 +20,5 @@ export {
   NoticeListener,
   VtbInfoUpdateListener,
   PlayerWindowCountListener,
-  AppUpdateListener
+  AppUpdateListener,
 }

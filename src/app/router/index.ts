@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',
     name: 'VtbLiving',
-    component: () => import('../views/VtbLiving.vue')
+    component: () => import('../views/VtbLiving.vue'),
   },
   {
     path: '/follow',
@@ -12,29 +12,29 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '/list/-1'
+        redirect: '/list/-1',
       },
       {
         path: '/list/:id',
-        component: () => import('../components/FollowList.vue')
-      }
-    ]
+        component: () => import('../components/FollowList.vue'),
+      },
+    ],
   },
   {
     path: '/vtbList',
     name: 'VtbList',
-    component: () => import('../views/VtbList.vue')
+    component: () => import('../views/VtbList.vue'),
   },
   {
     path: '/setting',
     name: 'Setting',
-    component: () => import('../views/Setting.vue')
+    component: () => import('../views/Setting.vue'),
   },
   {
     path: '/liveRoomEntry',
     name: 'LiveRoomEntry',
-    component: () => import('../views/LiveRoomEntry.vue')
-  }
+    component: () => import('../views/LiveRoomEntry.vue'),
+  },
 ]
 
 // const router = new VueRouter({
@@ -47,7 +47,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 export default router

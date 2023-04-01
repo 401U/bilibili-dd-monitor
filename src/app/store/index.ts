@@ -1,9 +1,10 @@
-import { FollowList, VtbInfo } from '@/interfaces'
-import { UpdateInfo } from 'electron-updater'
-import { _compareByOnlineDesc } from '@/app/utils/helpers'
-import { computed, ref, Ref } from 'vue'
+import type { UpdateInfo } from 'electron-updater'
+import type { Ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { defineStore } from 'pinia'
+import { _compareByOnlineDesc } from '@/app/utils/helpers'
+import type { FollowList, FollowListItem, VtbInfo } from '@/interfaces'
 
 export const usePiniaStore = defineStore('pinia', () => {
   const vtbInfos: Ref<Array<VtbInfo>> = ref([])
@@ -15,7 +16,7 @@ export const usePiniaStore = defineStore('pinia', () => {
   const updateAvailableModalVisible = ref(false)
   const updateInfo: Ref<UpdateInfo> = ref({
     version: '',
-    releaseNotes: ''
+    releaseNotes: '',
   } as UpdateInfo)
 
   const vtbCount = computed(() => vtbInfos.value.length)
@@ -23,36 +24,37 @@ export const usePiniaStore = defineStore('pinia', () => {
   const followedVtbMids = computed(() => {
     const followedVtbMids: number[] = []
     followLists.value.forEach((followList: FollowList) => {
-      followedVtbMids.push(...followList.list.map((item) => item.mid))
+      followedVtbMids.push(...followList.list.map(item => item.mid))
     })
     return followedVtbMids
   })
 
   const followedVtbInfos = computed(() => {
-    let followedVtbInfos: VtbInfo[] = []
-    followedVtbInfos = [
+    let result: VtbInfo[] = []
+    result = [
       ...vtbInfos.value.filter((vtbInfo: VtbInfo) => {
         return followedVtbMids.value.includes(vtbInfo.mid)
-      })
+      }),
     ]
 
     // merge manual followed vtubers into followedVtbInfos
-    const manualFollowItems: any[] = []
+    const manualFollowItems: FollowListItem[] = []
     followLists.value.forEach((followList: FollowList) => {
       const followListItems = followList.list
-      const followItems = followListItems.filter((item) => item.updateMethod === 'MANUAL')
+      const followItems = followListItems.filter(item => item.updateMethod === 'MANUAL')
       manualFollowItems.push(...followItems)
     })
 
-    followedVtbInfos.push(...manualFollowItems)
-    return followedVtbInfos.sort(_compareByOnlineDesc)
+    result.push(...manualFollowItems as unknown as VtbInfo[])
+    return result.sort(_compareByOnlineDesc)
   })
 
-  function updateVtbInfos (updatedVtbInfos: VtbInfo[], updatedInterval: number) {
+  function updateVtbInfos(updatedVtbInfos: VtbInfo[], updatedInterval: number) {
     // is first update. init vtbInfos
     if (vtbInfos.value.length === 0) {
       vtbInfos.value.push(...updatedVtbInfos)
-    } else {
+    }
+    else {
       // next update
       updatedVtbInfos.forEach((newVtbInfo: VtbInfo) => {
         const index = vtbInfos.value.findIndex(vtbInfo => vtbInfo.mid === newVtbInfo.mid)
@@ -60,7 +62,8 @@ export const usePiniaStore = defineStore('pinia', () => {
         if (index !== -1) {
           // do better: sort and show diff parts
           vtbInfos.value[index] = newVtbInfo
-        } else {
+        }
+        else {
           // not found, add this newVtbInfo to state.vtbInfos
           vtbInfos.value.push(newVtbInfo)
         }
@@ -70,7 +73,7 @@ export const usePiniaStore = defineStore('pinia', () => {
     averageUpdateInterval.value = updatedInterval
   }
 
-  function toggleShowUpdateAvailableModal (newUpdateInfo: UpdateInfo) {
+  function toggleShowUpdateAvailableModal(newUpdateInfo: UpdateInfo) {
     updateAvailableModalVisible.value = !updateAvailableModalVisible.value
     updateInfo.value = newUpdateInfo
   }
@@ -89,6 +92,6 @@ export const usePiniaStore = defineStore('pinia', () => {
     followedVtbMids,
     followedVtbInfos,
     updateVtbInfos,
-    toggleShowUpdateAvailableModal
+    toggleShowUpdateAvailableModal,
   }
 })

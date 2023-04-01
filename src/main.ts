@@ -1,5 +1,3 @@
-import App from '@/app/App.vue'
-import router from '@/app/router'
 import { createApp } from 'vue'
 
 // import font awesome icon
@@ -11,13 +9,13 @@ import {
   faEllipsisV,
   faGlobe,
   faHeart,
+  faHome,
   faListUl,
+  faPaperPlane,
   faPlusCircle,
   faSearch,
   faSignal,
   faUserFriends,
-  faPaperPlane,
-  faHome
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -28,12 +26,14 @@ import 'vue-select/dist/vue-select.css'
 // https://github.com/euvl/vue3-notification/
 import Notifications from '@kyvg/vue3-notification'
 
-import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { createPinia } from 'pinia'
-import { NoticeListener, FollowListService, VtbInfoUpdateListener, PlayerWindowCountListener, CDNListener, AppUpdateListener } from './app/services'
-import { slog } from './app/utils/helpers'
+import { AppUpdateListener, CDNListener, FollowListService, NoticeListener, PlayerWindowCountListener, VtbInfoUpdateListener } from './app/services'
+import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
+import { slog } from '@/app/utils/helpers'
+import App from '@/app/App.vue'
+import router from '@/app/router'
 
 library.add(
   faSignal,
@@ -47,34 +47,40 @@ library.add(
   faSearch,
   faEllipsisV,
   faPaperPlane,
-  faHome
+  faHome,
 )
 
 const pinia = createPinia()
 
+/*
+  eslint-disable
+  @typescript-eslint/no-unsafe-argument,
+  @typescript-eslint/no-unsafe-assignment,
+  @typescript-eslint/no-unsafe-call,
+  @typescript-eslint/no-unsafe-member-access,
+*/
 const app = createApp(App)
   .use(router)
   .use(pinia)
-  // .use(store, key)
   .use(VueVirtualScroller)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('v-select', vSelect)
   .component('orbit-spinner', OrbitSpinner)
   .use(Notifications)
 
-// app.config.productionTip = false
+// // app.config.productionTip = false
 
 app.mount('#app')
   .$nextTick(() => {
-    const noticeService = new NoticeListener()
+    const _noticeService = new NoticeListener()
     slog('INIT', 'NoticeService')
-    const followListService = new FollowListService()
-    const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+    const _followListService = new FollowListService()
+    const _vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
     slog('INIT', 'VtbInfoUpdateListener')
-    const playerWindowCountListener = new PlayerWindowCountListener()
+    const _playerWindowCountListener = new PlayerWindowCountListener()
     slog('INIT', 'PlayerWindowCountListener')
-    const cdnListener = new CDNListener()
+    const _cdnListener = new CDNListener()
     slog('INIT', 'CDNListener')
-    const appUpdateListener = new AppUpdateListener()
+    const _appUpdateListener = new AppUpdateListener()
     slog('INIT', 'appUpdateListener')
   })

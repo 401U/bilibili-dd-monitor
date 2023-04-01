@@ -1,7 +1,8 @@
-import { IpcRenderer } from 'electron'
-import { Observable, Observer } from 'rxjs'
+import type { IpcRenderer } from 'electron'
+import type { Observer } from 'rxjs'
+import { Observable } from 'rxjs'
 
-type Result = {
+interface Result {
   isValid: boolean
   info: object
 }
@@ -9,7 +10,7 @@ type Result = {
 export default class RoomService {
   private ipcRenderer: IpcRenderer
 
-  constructor () {
+  constructor() {
     this.ipcRenderer = window.ipcRenderer as IpcRenderer
   }
 
@@ -29,7 +30,7 @@ export default class RoomService {
     }
   }
 
-  getInfoByRoom (roomid: number): Observable<Result> {
+  getInfoByRoom(roomid: number): Observable<Result> {
     window.ipcRenderer.send('getInfoByRoom', roomid)
     return new Observable<Result>(this.sequenceSubscriber('getInfoByRoomReply'))
   }

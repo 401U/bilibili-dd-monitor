@@ -1,84 +1,8 @@
-<template>
-  <div id="app">
-    <!-- sidebar -->
-    <div class="nav-container">
-      <nav id="nav" class="nav">
-        <ul class="nav-list">
-          <li class="nav-list-item">
-            <router-link to="/" class="nav-list-item-link">
-              <font-awesome-icon :icon="['fas', 'home']" class="nav-list-item-icon"/>
-              主页
-            </router-link>
-          </li>
-          <li class="nav-list-item">
-            <router-link to="/follow" class="nav-list-item-link" :class="{'router-link-active':subIsActive('/list')}">
-              <font-awesome-icon :icon="['fas', 'heart']" class="nav-list-item-icon"/>
-              关注
-            </router-link>
-          </li>
-          <li class="nav-list-item">
-            <router-link to="/vtbList" class="nav-list-item-link">
-              <font-awesome-icon :icon="['fas', 'list-ul']" class="nav-list-item-icon"/>
-              DD_CENTER
-            </router-link>
-          </li>
-          <li class="nav-list-item">
-            <router-link to="/setting" class="nav-list-item-link">
-              <font-awesome-icon :icon="['fas', 'cog']" class="nav-list-item-icon"/>
-              设置
-            </router-link>
-          </li>
-          <li class="nav-list-item">
-            <router-link to="/liveRoomEntry" class="nav-list-item-link">
-              <font-awesome-icon :icon="['fas', 'paper-plane']" class="nav-list-item-icon"/>
-              直播间入口
-            </router-link>
-          </li>
-        </ul>
-      </nav>
-      <div class="shield-container">
-        <vue-shield class="shield-item" :title="'CDN'" :content="currentCDN"/>
-        <vue-shield class="shield-item" :title="'已获取 vtubers'" :content="vtbCount"/>
-        <vue-shield class="shield-item" :title="'正在直播'" :content="livingVtbCount"/>
-        <vue-shield class="shield-item" :title="'正在更新'" :content="updateVtbCount"/>
-        <vue-shield class="shield-item" :title="'平均更新间隔(MS)'" :content="averageUpdateInterval"/>
-        <vue-shield class="shield-item" :title="'当前播放器窗口'" :content="playerWindowCount"/>
-      </div>
-    </div>
-    <!-- main-->
-    <main class="content">
-      <router-view/>
-    </main>
-
-    <!-- for custom style: https://github.com/euvl/vue3-notification#style-->
-    <notifications group="action-feedback" position="top center"/>
-
-    <!-- use v-if to make lazy compile-->
-    <div v-if="updateAvailableModalVisible" id="modal-update-available" class="modal modal-update-available">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">发现更新</h3>
-        </div>
-        <div class="modal-body">
-          <h4>新版本: {{ updateInfo && updateInfo.version }}. 是否立即下载？</h4>
-          <p>更新内容</p>
-          <p v-html="(updateInfo && updateInfo.releaseNotes)"></p>
-        </div>
-        <div class="modal-footer">
-          <button class="modal-button modal-button-ok" @click="handleClickOK">是</button>
-          <button class="modal-button modal-button-cancel" @click="handleClickCancel">否</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</template>
-
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import VueShield from '@/app/components/VueShield.vue'
 import { computed } from 'vue'
 import { usePiniaStore } from './store'
+import VueShield from '@/app/components/VueShield.vue'
 const store = usePiniaStore()
 
 const vtbCount = computed(() => store.vtbCount)
@@ -90,23 +14,104 @@ const currentCDN = computed(() => store.currentCDN)
 const updateAvailableModalVisible = computed(() => store.updateAvailableModalVisible)
 const updateInfo = computed(() => store.updateInfo)
 
-function subIsActive (routePath: string | string[]): boolean {
+function subIsActive(routePath: string | string[]): boolean {
   const paths = Array.isArray(routePath) ? routePath : [routePath]
   return paths.some((path) => {
-    return useRouter().currentRoute.value.path.indexOf(path) !== -1
+    return useRouter().currentRoute.value.path.includes(path)
   })
 }
-function handleClickOK () {
+function handleClickOK() {
   // here should lock UI
   store.toggleShowUpdateAvailableModal(updateInfo.value)
   // window.api.ipcRenderer.send('user-confirm-download')
   // here should unlock UI
   // (doge 这里更好的做法是锁UI，防止重复的快速点击
 }
-function handleClickCancel () {
+function handleClickCancel() {
   store.toggleShowUpdateAvailableModal(updateInfo.value)
 }
 </script>
+
+<template>
+  <div id="app">
+    <!-- sidebar -->
+    <div class="nav-container">
+      <nav id="nav" class="nav">
+        <ul class="nav-list">
+          <li class="nav-list-item">
+            <router-link to="/" class="nav-list-item-link">
+              <font-awesome-icon :icon="['fas', 'home']" class="nav-list-item-icon" />
+              主页
+            </router-link>
+          </li>
+          <li class="nav-list-item">
+            <router-link to="/follow" class="nav-list-item-link" :class="{ 'router-link-active': subIsActive('/list') }">
+              <font-awesome-icon :icon="['fas', 'heart']" class="nav-list-item-icon" />
+              关注
+            </router-link>
+          </li>
+          <li class="nav-list-item">
+            <router-link to="/vtbList" class="nav-list-item-link">
+              <font-awesome-icon :icon="['fas', 'list-ul']" class="nav-list-item-icon" />
+              DD_CENTER
+            </router-link>
+          </li>
+          <li class="nav-list-item">
+            <router-link to="/setting" class="nav-list-item-link">
+              <font-awesome-icon :icon="['fas', 'cog']" class="nav-list-item-icon" />
+              设置
+            </router-link>
+          </li>
+          <li class="nav-list-item">
+            <router-link to="/liveRoomEntry" class="nav-list-item-link">
+              <font-awesome-icon :icon="['fas', 'paper-plane']" class="nav-list-item-icon" />
+              直播间入口
+            </router-link>
+          </li>
+        </ul>
+      </nav>
+      <div class="shield-container">
+        <VueShield class="shield-item" title="CDN" :content="currentCDN" />
+        <VueShield class="shield-item" title="已获取 vtubers" :content="vtbCount" />
+        <VueShield class="shield-item" title="正在直播" :content="livingVtbCount" />
+        <VueShield class="shield-item" title="正在更新" :content="updateVtbCount" />
+        <VueShield class="shield-item" title="平均更新间隔(MS)" :content="averageUpdateInterval" />
+        <VueShield class="shield-item" title="当前播放器窗口" :content="playerWindowCount" />
+      </div>
+    </div>
+    <!-- main -->
+    <main class="content">
+      <router-view />
+    </main>
+
+    <!-- for custom style: https://github.com/euvl/vue3-notification#style -->
+    <notifications group="action-feedback" position="top center" />
+
+    <!-- use v-if to make lazy compile -->
+    <div v-if="updateAvailableModalVisible" id="modal-update-available" class="modal modal-update-available">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            发现更新
+          </h3>
+        </div>
+        <div class="modal-body">
+          <h4>新版本: {{ updateInfo && updateInfo.version }}. 是否立即下载？</h4>
+          <p>更新内容</p>
+          <p v-html="(updateInfo && updateInfo.releaseNotes)" />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button modal-button-ok" @click="handleClickOK">
+            是
+          </button>
+          <button class="modal-button modal-button-cancel" @click="handleClickCancel">
+            否
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss">
 // my free style reset
@@ -288,5 +293,4 @@ function handleClickCancel () {
   }
 
 }
-
 </style>

@@ -1,5 +1,6 @@
-import { Observable, Observer, TimeoutError } from 'rxjs'
-import { FollowList, FollowListItem } from '@/interfaces'
+import type { Observer } from 'rxjs'
+import { Observable } from 'rxjs'
+import type { FollowList, FollowListItem } from '@/interfaces'
 import { slog } from '@/app/utils/helpers'
 import { usePiniaStore } from '@/app/store'
 
@@ -9,12 +10,12 @@ import { usePiniaStore } from '@/app/store'
 export default class FollowListService {
   private store
 
-  constructor () {
+  constructor() {
     this.store = usePiniaStore()
     this.initService()
   }
 
-  initService () {
+  initService() {
     this.getFollowLists().subscribe((followLists: FollowList[]) => {
       slog('INIT', 'followlists')
       this.store.followLists = followLists
@@ -80,7 +81,7 @@ export default class FollowListService {
   /**
    * get all follow list
    */
-  getFollowLists (): Observable<FollowList[]> {
+  getFollowLists(): Observable<FollowList[]> {
     window.ipcRenderer.send('getFollowLists')
     return new Observable<FollowList[]>(this.sequenceSubscriber('getFollowListsReply'))
   }
@@ -89,7 +90,7 @@ export default class FollowListService {
    * create new group
    * @param name
    */
-  addFollowList (name: string): Observable<FollowList[]> {
+  addFollowList(name: string): Observable<FollowList[]> {
     window.ipcRenderer.send('addFollowList', name)
     return new Observable<FollowList[]>(this.sequenceSubscriber('addFollowListReply'))
   }
@@ -98,7 +99,7 @@ export default class FollowListService {
    * delete group
    * @param id
    */
-  deleteFollowList (id: number): Observable<FollowList[]> {
+  deleteFollowList(id: number): Observable<FollowList[]> {
     window.ipcRenderer.send('deleteFollowList', id)
     return new Observable<FollowList[]>(this.sequenceSubscriber('deleteFollowListReply'))
   }
@@ -108,7 +109,7 @@ export default class FollowListService {
    * @param id
    * @param newName
    */
-  renameFollowList (id: number, newName: string): Observable<FollowList[]> {
+  renameFollowList(id: number, newName: string): Observable<FollowList[]> {
     window.ipcRenderer.send('renameFollowList', id, newName)
     return new Observable<FollowList[]>(this.sequenceSubscriber('renameFollowListReply'))
   }
@@ -117,7 +118,7 @@ export default class FollowListService {
    * toggle follow
    * @param followListItem
    */
-  toggleFollow (followListItem: FollowListItem): Observable<FollowList[]> {
+  toggleFollow(followListItem: FollowListItem): Observable<FollowList[]> {
     window.ipcRenderer.send('toggleFollow', JSON.stringify(followListItem))
     return new Observable<FollowList[]>(this.sequenceSubscriber('toggleFollowReply'))
   }
@@ -132,7 +133,7 @@ export default class FollowListService {
    * @param followListItems
    * @param listId
    */
-  addItemsToFollowList (followListItems: FollowListItem[], listId: number): Observable<FollowList[]> {
+  addItemsToFollowList(followListItems: FollowListItem[], listId: number): Observable<FollowList[]> {
     window.ipcRenderer.send('setFollowList', followListItems, listId)
     return new Observable<FollowList[]>(this.sequenceSubscriber('setFollowListReply'))
   }

@@ -1,37 +1,17 @@
-<template>
-  <div class="setting-container">
-    <div class="setting-item">
-      <p class="setting-item-description">启动时通知正在进行的直播</p>
-      <input
-        type="checkbox"
-        @click="handleIsNotifiedOnStartChange()"
-        :checked="isNotifiedOnStart"
-        class="setting-item-notify-me-about-live-when-start"
-      />
-    </div>
-    <div class="setting-item">
-      <p class="setting-item-description">
-        配置文件路径: <span class="setting-item-settings-path">{{ settingsPath }}</span>
-      </p>
-      <button class="setting-item-open-settings-path" @click="openSettingsPath()">打开</button>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import SettingService from '@/app/services/SettingService'
 import { ref } from 'vue'
+import SettingService from '@/app/services/SettingService'
 const isNotifiedOnStart = ref(false)
 const settingsPath = ref('')
 const settingService = new SettingService()
 
-function handleIsNotifiedOnStartChange () {
+function handleIsNotifiedOnStartChange() {
   settingService.setIsNotifiedOnStart(!isNotifiedOnStart.value).subscribe((value) => {
     isNotifiedOnStart.value = value
   })
 }
 
-function openSettingsPath () {
+function openSettingsPath() {
   settingService.openPathOfSettings()
 }
 
@@ -42,6 +22,30 @@ settingService.getPathOfSettings().subscribe((path) => {
   settingsPath.value = path
 })
 </script>
+
+<template>
+  <div class="setting-container">
+    <div class="setting-item">
+      <p class="setting-item-description">
+        启动时通知正在进行的直播
+      </p>
+      <input
+        type="checkbox"
+        :checked="isNotifiedOnStart"
+        class="setting-item-notify-me-about-live-when-start"
+        @click="handleIsNotifiedOnStartChange()"
+      >
+    </div>
+    <div class="setting-item">
+      <p class="setting-item-description">
+        配置文件路径: <span class="setting-item-settings-path">{{ settingsPath }}</span>
+      </p>
+      <button class="setting-item-open-settings-path" @click="openSettingsPath()">
+        打开
+      </button>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .setting-container {

@@ -1,10 +1,36 @@
+<script setup lang="ts">
+import { defineComponent } from 'vue'
+import type { VtbInfo } from '@/interfaces'
+
+defineProps<{
+  index: number
+  source: VtbInfo
+  toggleFollow: (mid: number) => void
+  enterRoom: (roomId: number) => void
+  handleSetListModalShow: (mid: number) => void
+}>()
+
+defineComponent({
+  name: 'ItemComponent',
+})
+
+function getSignCSSClass(source: any) {
+  const isManualSignInfo = source.updateMethod === 'MANUAL'
+  return isManualSignInfo ? 'manual-sign-warn' : ''
+}
+</script>
+
 <template>
   <div :key="source.mid" class="virtual-list-item">
     <div class="virtual-list-item-media">
-      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face!" alt=""/>
+      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face!" alt="">
       <div class="virtual-list-item-media-body">
-        <h3 class="virtual-list-item-media-title">{{ source.uname }}</h3>
-        <p class="virtual-list-item-media-content" :class="[getSignCSSClass(source)]">{{ source.sign }}</p>
+        <h3 class="virtual-list-item-media-title">
+          {{ source.uname }}
+        </h3>
+        <p class="virtual-list-item-media-content" :class="[getSignCSSClass(source)]">
+          {{ source.sign }}
+        </p>
       </div>
       <div class="virtual-list-item-media-action">
         <a class="virtual-list-item-media-unfollow" @click="toggleFollow(source.mid)">取关</a>
@@ -17,30 +43,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { VtbInfo } from '@/interfaces'
-import { defineComponent } from 'vue'
-
-defineComponent({
-  name: 'item-component'
-})
-
-const props = defineProps<{
-  index: number,
-  source: VtbInfo,
-  toggleFollow:(mid: number) => void,
-  enterRoom: (roomId: number) => void,
-  handleSetListModalShow: (mid: number) => void
-}>()
-
-function getSignCSSClass (source: any) {
-  const isManualSignInfo = source.updateMethod === 'MANUAL'
-  return isManualSignInfo ? 'manual-sign-warn' : ''
-}
-</script>
-
 <style scoped lang="scss">
-
 .virtual-list-item {
   border-bottom: #e2e2e2 solid 1px;
   list-style: none;

@@ -1,57 +1,16 @@
-<template>
-  <div class="vtuber-list">
-    <div class="search">
-      <input class="search-input" v-model="searchInput"/>
-      <button class="search-button">
-        <font-awesome-icon class="search-icon" :icon="['fas', 'search']"/>
-      </button>
-    </div>
-    <div class="search-help">
-      <p class="search-indicator">{{ searchIndicator }}</p>
-      <div class="search-filter">
-        <p class="online-only">
-          <input type="checkbox" id="online-only" :checked="showOnlineOnly" @click="toggleOnlineOnly()">
-          <label for="online-only"> 仅显示在线</label>
-        </p>
-      </div>
-    </div>
-    <DynamicScroller
-      :items="filteredVtbInfos"
-      :min-item-size="20"
-      key-field="mid"
-      style="height: 800px; overflow-y: auto;"
-    >
-      <template v-slot="{ item, index, active }">
-        <DynamicScrollerItem
-          :item="item"
-          :data-index="index"
-          :active="active"
-        >
-          <VtbListItem
-            :index="index"
-            :source="item"
-            :followedVtbMids="followedVtbMids"
-            :toggleFollow="toggleFollow"
-            :enterRoom="enterRoom"
-          />
-        </DynamicScrollerItem>
-      </template>
-    </DynamicScroller>
-  </div>
-</template>
-
 <script setup lang="ts">
-import VtbListItem from '@/app/components/VtbListItem.vue'
-import { FollowListService, LivePlayService } from '@/app/services/index'
 import _ from 'lodash'
-import { _compareByOnlineDesc } from '@/app/utils/helpers'
-import { computed, ComputedRef, defineComponent, Ref, ref, watch } from 'vue'
-import { VtbInfo } from '@/interfaces'
+import type { Ref } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import { usePiniaStore } from '../store'
+import VtbListItem from '@/app/components/VtbListItem.vue'
+import { FollowListService, LivePlayService } from '@/app/services/index'
+import { _compareByOnlineDesc } from '@/app/utils/helpers'
+import type { VtbInfo } from '@/interfaces'
 
 defineComponent({
-  name: 'VtbList'
+  name: 'VtbList',
 })
 
 const searchInput: Ref<string> = ref('')
@@ -63,28 +22,27 @@ let followListService: FollowListService
 let livePlayService: LivePlayService
 
 const searchIndicator = computed(() => {
-  if (isSearchCalculating.value) {
+  if (isSearchCalculating.value)
     return '⟳ 正在处理...'
-  } else if (searchInputIsDirty.value) {
+  else if (searchInputIsDirty.value)
     return '⟳ 正在输入...'
-  } else {
-    return '✓ 处理完成。结果数：' + filteredVtbInfos.value.length
-  }
+  else
+    return `✓ 处理完成。结果数：${filteredVtbInfos.value.length}`
 })
 
 const store = usePiniaStore()
 const vtbInfos = computed(() => store.vtbInfos)
 const followedVtbMids = computed(() => store.followedVtbMids)
-function initService () {
+function initService() {
   followListService = new FollowListService()
   livePlayService = new LivePlayService()
 }
 
-function loadData () {
+function loadData() {
   // trigger init search by ''
   searchVtbInfosByName(searchInput.value)
 }
-const computeSearch = _.debounce(function () {
+const computeSearch = _.debounce(() => {
   isSearchCalculating.value = true
   setTimeout(() => {
     searchVtbInfosByName(searchInput.value)
@@ -92,32 +50,33 @@ const computeSearch = _.debounce(function () {
     searchInputIsDirty.value = false
   }, 200)
 }, 500)
-function searchVtbInfosByName (name: string) {
-  const filteredByName = vtbInfos.value.filter((vtbInfo) => vtbInfo.uname?.includes(name))
+function searchVtbInfosByName(name: string) {
+  const filteredByName = vtbInfos.value.filter(vtbInfo => vtbInfo.uname?.includes(name))
   let filteredByOnlineState
   if (showOnlineOnly.value) {
-    filteredByOnlineState = filteredByName.filter((vtbInfo) => !!vtbInfo.liveStatus)
-  } else {
+    filteredByOnlineState = filteredByName.filter(vtbInfo => !!vtbInfo.liveStatus)
+  }
+  else {
     // noop for filteredByName
     filteredByOnlineState = filteredByName
   }
 
   filteredVtbInfos.value = filteredByOnlineState.sort(_compareByOnlineDesc)
 }
-function toggleFollow (mid: number) {
+function toggleFollow(mid: number) {
   const followListItem = {
     mid,
     infoSource: 'DD_CENTER',
-    updateMethod: 'AUTO'
+    updateMethod: 'AUTO',
   }
   followListService.toggleFollow(followListItem).subscribe((followLists) => {
     store.followLists = followLists
   })
 }
-function enterRoom (roomid: number) {
+function enterRoom(roomid: number) {
   livePlayService.enterRoom(roomid)
 }
-function toggleOnlineOnly () {
+function toggleOnlineOnly() {
   showOnlineOnly.value = !showOnlineOnly.value
 }
 
@@ -136,6 +95,50 @@ watch(vtbInfos, () => {
   searchVtbInfosByName(searchInput.value)
 })
 </script>
+
+<template>
+  <div class="vtuber-list">
+    <div class="search">
+      <input v-model="searchInput" class="search-input">
+      <button class="search-button">
+        <font-awesome-icon class="search-icon" :icon="['fas', 'search']" />
+      </button>
+    </div>
+    <div class="search-help">
+      <p class="search-indicator">
+        {{ searchIndicator }}
+      </p>
+      <div class="search-filter">
+        <p class="online-only">
+          <input id="online-only" type="checkbox" :checked="showOnlineOnly" @click="toggleOnlineOnly()">
+          <label for="online-only"> 仅显示在线</label>
+        </p>
+      </div>
+    </div>
+    <DynamicScroller
+      :items="filteredVtbInfos"
+      :min-item-size="20"
+      key-field="mid"
+      style="height: 800px; overflow-y: auto;"
+    >
+      <template #default="{ item, index, active }">
+        <DynamicScrollerItem
+          :item="item"
+          :data-index="index"
+          :active="active"
+        >
+          <VtbListItem
+            :index="index"
+            :source="item"
+            :followed-vtb-mids="followedVtbMids"
+            :toggle-follow="toggleFollow"
+            :enter-room="enterRoom"
+          />
+        </DynamicScrollerItem>
+      </template>
+    </DynamicScroller>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .search {
@@ -179,5 +182,4 @@ watch(vtbInfos, () => {
     color: white;
   }
 }
-
 </style>

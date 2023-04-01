@@ -1,18 +1,18 @@
-import { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
+import type { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
 
 class SearchHistoryService {
   private localStorage: Storage
   private static readonly ARRAY_KEY = 'search_history'
 
-  constructor () {
+  constructor() {
     this.localStorage = window.localStorage
   }
 
-  get (): Array<SearchHistoryItem> {
-    return JSON.parse(this.localStorage.getItem(SearchHistoryService.ARRAY_KEY) || '[]')
+  get(): Array<SearchHistoryItem> {
+    return JSON.parse(this.localStorage.getItem(SearchHistoryService.ARRAY_KEY) || '[]') as Array<SearchHistoryItem>
   }
 
-  add (info: any): boolean {
+  add(info: { mid: number; roomid: number; uname: string; face: string }): boolean {
     try {
       const searchHistoryList = this.get()
       const newItem: SearchHistoryItem = {
@@ -20,17 +20,18 @@ class SearchHistoryService {
         roomid: info.roomid,
         uname: info.uname,
         face: info.face,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
       searchHistoryList.push(newItem)
       this.localStorage.setItem(SearchHistoryService.ARRAY_KEY, JSON.stringify(searchHistoryList))
       return true
-    } catch (e) {
+    }
+    catch (e) {
       return false
     }
   }
 
-  remove (roomid: number): boolean {
+  remove(roomid: number): boolean {
     try {
       let searchHistoryList = this.get()
       searchHistoryList = searchHistoryList.filter((item) => {
@@ -38,12 +39,13 @@ class SearchHistoryService {
       })
       this.localStorage.setItem(SearchHistoryService.ARRAY_KEY, JSON.stringify(searchHistoryList))
       return true
-    } catch (e) {
+    }
+    catch (e) {
       return false
     }
   }
 
-  clear () {
+  clear() {
     this.localStorage.removeItem(SearchHistoryService.ARRAY_KEY)
   }
 }

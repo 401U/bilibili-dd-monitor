@@ -1,9 +1,11 @@
-import { dialog, Menu, MenuItem, screen, shell } from 'electron'
-import { PlayerObj } from '@/interfaces'
+import type { MenuItem } from 'electron'
+import { Menu, dialog, screen, shell } from 'electron'
 import { checkForUpdates } from './updater'
-import ContextMap from '@/electron/utils/ContextMap'
+import { log } from './utils/logger'
+import type { PlayerObj } from '@/interfaces'
+import type ContextMap from '@/electron/utils/ContextMap'
 
-export const createMainWindowMenu = (app: Electron.App, players: ContextMap<number, PlayerObj>) => {
+export function createMainWindowMenu(app: Electron.App, players: ContextMap) {
   const primaryDisplays: Electron.Display[] = screen.getAllDisplays()
   const autoSetPlayerBounds = (display: Electron.Display) => {
     // example: 1080/1920 =0.55
@@ -12,7 +14,7 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
     if (playerNum > 0) {
       const {
         width,
-        height
+        height,
       } = display.workAreaSize
       const getProportion = (playerNum: number, rowNum: number) => {
         const colNum = Math.ceil(playerNum / rowNum)
@@ -50,9 +52,10 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             x: display.bounds.x + col * playerWidth,
             y: display.bounds.y + row * playerHeight,
             height: playerHeight,
-            width: playerWidth
+            width: playerWidth,
           })
-        } catch (e) {
+        }
+        catch (e) {
         }
       })
     }
@@ -70,8 +73,8 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             { role: 'hideothers' },
             { role: 'unhide' },
             { type: 'separator' },
-            { role: 'quit' }
-          ]
+            { role: 'quit' },
+          ],
         }]
       : []), {
       label: '播放器',
@@ -82,7 +85,7 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             players.forEach((player: PlayerObj) => {
               player.playerWindow.setAlwaysOnTop(true)
             })
-          }
+          },
         },
         {
           label: '取消置顶当前所有播放器',
@@ -90,7 +93,7 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             players.forEach((player: PlayerObj) => {
               player.playerWindow.setAlwaysOnTop(false)
             })
-          }
+          },
         },
         {
           label: '自动重排窗口',
@@ -98,9 +101,8 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             label: `显示器${index.toString()} ${display.size.width} X ${display.size.height}`,
             click: (() => {
               return autoSetPlayerBounds(display)
-              // eslint-disable-next-line @typescript-eslint/ban-types
-            }) as Function
-          } as MenuItem))
+            }) as Function,
+          } as MenuItem)),
         },
         {
           label: '显示所有播放器',
@@ -108,7 +110,7 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             players.forEach((player: PlayerObj) => {
               player.playerWindow.show()
             })
-          }
+          },
         },
         {
           label: '最小化所有播放器',
@@ -116,19 +118,18 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             players.forEach((player: PlayerObj) => {
               player.playerWindow.minimize()
             })
-          }
+          },
         },
         {
           label: '关闭所有播放器',
           click: () => {
             players.forEach((playerObj: PlayerObj) => {
-              if (playerObj.playerWindow) {
+              if (playerObj.playerWindow)
                 playerObj.playerWindow.close()
-              }
             })
-          }
-        }
-      ]
+          },
+        },
+      ],
     }, {
       label: '帮助',
       submenu: [
@@ -136,19 +137,25 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
           label: '帮助文档',
           click: () => {
             shell.openExternal('https://github.com/wdpm/bilibili-dd-monitor')
-          }
+              .catch((_err) => {
+                log.error('open help failed')
+              })
+          },
         },
         {
           label: '问题反馈',
           click: () => {
             shell.openExternal('https://github.com/wdpm/bilibili-dd-monitor/issues')
-          }
+              .catch((_err) => {
+                log.error('open help failed')
+              })
+          },
         },
         {
           label: '检测更新',
           click: (menuItem: MenuItem, focusedWindow: Electron.BrowserWindow) => {
             checkForUpdates(menuItem, focusedWindow)
-          }
+          },
         },
         {
           label: '关于',
@@ -156,22 +163,24 @@ export const createMainWindowMenu = (app: Electron.App, players: ContextMap<numb
             const options = {
               type: 'info',
               title: '关于',
-              message: `bilibili-dd-monitor Powered By DD. 当前版本:${app.getVersion()}`
+              message: `bilibili-dd-monitor Powered By DD. 当前版本:${app.getVersion()}`,
             }
             dialog.showMessageBox(focusedWindow, options)
-          }
+              .catch((_err) => {
+                log.error('open help failed')
+              })
+          },
         },
         {
           label: '打开主窗口调试控制台',
           click: (item: any, focusedWindow: { toggleDevTools: () => void }) => {
-            if (focusedWindow) {
+            if (focusedWindow)
               focusedWindow.toggleDevTools()
-            }
-          }
-        }
-      ]
-    }
-  ]
+          },
+        },
+      ],
+    },
+  ] as (Electron.MenuItem | Electron.MenuItemConstructorOptions)[]
 
-  return Menu.buildFromTemplate(template as any)
+  return Menu.buildFromTemplate(template)
 }

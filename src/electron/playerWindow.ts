@@ -1,29 +1,32 @@
-import { BrowserWindow, nativeImage } from 'electron'
-import fs from 'fs'
-import { join } from 'path'
-import { PlayerObj, VtbInfo } from '@/interfaces'
+import fs, { createWriteStream } from 'node:fs'
+import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { pipeline } from 'node:stream'
-import { createWriteStream } from 'node:fs'
+import { BrowserWindow, nativeImage } from 'electron'
 
 import fetch from 'node-fetch'
-import ContextMap from '@/electron/utils/ContextMap'
+import { log } from './utils/logger'
+import type { PlayerObj, VtbInfo } from '@/interfaces'
+import type ContextMap from '@/electron/utils/ContextMap'
 const streamPipeline = promisify(pipeline)
 
-const downloadAndSetWindowIcon = (vtbInfo: VtbInfo, tempPath: string, win: Electron.BrowserWindow) => {
+function downloadAndSetWindowIcon(vtbInfo: VtbInfo, tempPath: string, win: Electron.BrowserWindow) {
   if (vtbInfo.face) {
-    fetch('' + vtbInfo.face).then((response) => {
-      if (!response.ok) {
-        throw new Error('Invalid status code <' + response.status + '>')
-      }
-      streamPipeline(response.body, createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
+    fetch(`${vtbInfo.face}`).then((response) => {
+      if (!response.ok)
+        throw new Error(`Invalid status code <${response.status}>`)
+
+      streamPipeline(response.body, createWriteStream(join(tempPath, `./faces/${vtbInfo.roomid!}.jpg`)))
+        .catch((error) => {
+          log.error(JSON.stringify(error))
+        })
     }).finally(() => {
-      win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
+      win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid!}.jpg`)))
     })
   }
 }
 
-export const createPlayerWindow = (app: Electron.App, vtbInfo: VtbInfo, playerObjMap: ContextMap<number, PlayerObj>): PlayerObj => {
+export function createPlayerWindow(app: Electron.App, vtbInfo: VtbInfo, playerObjMap: ContextMap): PlayerObj {
   const tempPath = app.getPath('temp')
   // C:\Users\{your-name}\AppData\Local\Temp in windows 10
 
@@ -34,18 +37,20 @@ export const createPlayerWindow = (app: Electron.App, vtbInfo: VtbInfo, playerOb
     enableLargerThanScreen: true,
     useContentSize: true,
     title: vtbInfo.title || '',
-    webPreferences: {}
+    webPreferences: {},
   })
   // endregion
 
   // region window icon
   // download vtbInfo.face => ./faces/${vtbInfo.roomid}.jpg
-  if (fs.existsSync(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`))) {
-    win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid}.jpg`)))
-  } else {
+  if (fs.existsSync(join(tempPath, `./faces/${vtbInfo.roomid!}.jpg`))) {
+    win.setIcon(nativeImage.createFromPath(join(tempPath, `./faces/${vtbInfo.roomid!}.jpg`)))
+  }
+  else {
     if (fs.existsSync(join(tempPath, './faces'))) {
       downloadAndSetWindowIcon(vtbInfo, tempPath, win)
-    } else {
+    }
+    else {
       fs.mkdir(join(tempPath, './faces'), () => {
         downloadAndSetWindowIcon(vtbInfo, tempPath, win)
       })
@@ -61,10 +66,15 @@ export const createPlayerWindow = (app: Electron.App, vtbInfo: VtbInfo, playerOb
 
   // region load live stream url
   // example https://www.bilibili.com/blackboard/live/live-activity-player.html?enterTheRoom=0&cid=21320551
-  win.loadURL(`https://www.bilibili.com/blackboard/live/live-activity-player.html?enterTheRoom=0&cid=${vtbInfo.roomid}`)
+  win.loadURL(`https://www.bilibili.com/blackboard/live/live-activity-player.html?enterTheRoom=0&cid=${vtbInfo.roomid!}`)
     .then(() => {
       // inject custom CSS rules
       win.webContents.insertCSS('.bilibili-live-player-video-logo{display:none}')
+        .catch((_err) => {
+          log.error(`failed to inject custom CSS rules: ${vtbInfo.roomid!}`)
+        })
+    }).catch((_err) => {
+      log.error(`failed to load live stream url: ${vtbInfo.roomid!}`)
     })
   // endregion
 
@@ -72,16 +82,15 @@ export const createPlayerWindow = (app: Electron.App, vtbInfo: VtbInfo, playerOb
   win.setMenu(null)
 
   win.on('close', () => {
-    console.log('try to close player window(roomid):', vtbInfo.roomid)
+    log.debug(`try to close player window(roomid): ${vtbInfo.roomid!}`)
     if (vtbInfo.roomid) {
-      if (playerObjMap && playerObjMap.size > 0) {
+      if (playerObjMap && playerObjMap.size > 0)
         playerObjMap.deleteAndNotify(vtbInfo.roomid)
-      }
     }
   })
 
   return {
     roomid: vtbInfo.roomid,
-    playerWindow: win
+    playerWindow: win,
   }
 }

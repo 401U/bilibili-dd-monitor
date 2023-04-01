@@ -1,30 +1,29 @@
-import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import type { IpcRendererEvent } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
-function domReady (condition: DocumentReadyState[] = ['complete', 'interactive']) {
+function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
     if (condition.includes(document.readyState)) {
       resolve(true)
-    } else {
+    }
+    else {
       document.addEventListener('readystatechange', () => {
-        if (condition.includes(document.readyState)) {
+        if (condition.includes(document.readyState))
           resolve(true)
-        }
       })
     }
   })
 }
 
 const safeDOM = {
-  append (parent: HTMLElement, child: HTMLElement) {
-    if (!Array.from(parent.children).find(e => e === child)) {
+  append(parent: HTMLElement, child: HTMLElement) {
+    if (!Array.from(parent.children).find(e => e === child))
       return parent.appendChild(child)
-    }
   },
-  remove (parent: HTMLElement, child: HTMLElement) {
-    if (Array.from(parent.children).find(e => e === child)) {
+  remove(parent: HTMLElement, child: HTMLElement) {
+    if (Array.from(parent.children).find(e => e === child))
       return parent.removeChild(child)
-    }
-  }
+  },
 }
 
 /**
@@ -33,7 +32,7 @@ const safeDOM = {
  * https://projects.lukehaas.me/css-loaders
  * https://matejkustec.github.io/SpinThatShit
  */
-function useLoading () {
+function useLoading() {
   const className = 'loaders-css__square-spin'
   const styleContent = `
 @keyframes square-spin {
@@ -71,23 +70,25 @@ function useLoading () {
   oDiv.innerHTML = `<div class="${className}"><div></div></div>`
 
   return {
-    appendLoading () {
+    appendLoading() {
       safeDOM.append(document.head, oStyle)
       safeDOM.append(document.body, oDiv)
     },
-    removeLoading () {
+    removeLoading() {
       safeDOM.remove(document.head, oStyle)
       safeDOM.remove(document.body, oDiv)
-    }
+    },
   }
 }
 
 // ----------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const { appendLoading, removeLoading } = useLoading()
-domReady().then(appendLoading)
+domReady().then(appendLoading).catch((_err) => {})
 
 window.onmessage = (ev) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
@@ -103,8 +104,6 @@ contextBridge.exposeInMainWorld(
   'ipcRenderer', {
     on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on(channel, listener),
     once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.once(channel, listener),
-    send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args)
-  }
+    send: (channel: string, ...args: []) => ipcRenderer.send(channel, ...args),
+  },
 )
-
-console.log('hit preload')

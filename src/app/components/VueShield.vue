@@ -1,21 +1,21 @@
+<script setup lang="ts">
+import { defineComponent } from 'vue'
+
+defineProps<{
+  title: string
+  content: string | number
+}>()
+defineComponent({
+  name: 'VueShield',
+})
+</script>
+
 <template>
   <div class="shield">
     <span class="shield-title">{{ title }}</span>
     <span class="shield-content">{{ content }}</span>
   </div>
 </template>
-
-<script setup lang="ts">
-import { defineComponent, Ref } from 'vue'
-
-defineComponent({
-  name: 'vue-shield'
-})
-defineProps<{
-  title: string
-  content: string|number
-}>()
-</script>
 
 <style scoped lang="scss">
 .shield {

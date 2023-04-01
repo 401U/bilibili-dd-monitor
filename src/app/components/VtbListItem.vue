@@ -1,19 +1,46 @@
+<script setup lang="ts">
+import { computed, defineComponent } from 'vue'
+
+const props = defineProps<{
+  index: number
+  source: any
+  followedVtbMids: Array<number>
+  toggleFollow: (mid: number) => void
+  enterRoom: (roomId: number) => void
+}>()
+
+defineComponent({
+  name: 'ItemComponent',
+})
+
+const rank = computed(() => {
+  const rank = props.index + 1
+  return rank < 10 ? `0${rank}` : rank
+})
+</script>
+
 <template>
   <div :key="source.mid" class="virtual-list-item" :class="[`rank-${rank}`]">
     <div class="virtual-list-item-media">
-      <span class="virtual-list-item-rank" v-if="rank <=10">NO.{{ rank }}</span>
-      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face" alt=""/>
+      <span v-if="rank <= 10" class="virtual-list-item-rank">NO.{{ rank }}</span>
+      <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face" alt="">
       <div class="virtual-list-item-media-body">
-        <h3 class="virtual-list-item-media-title">{{ source.uname }}</h3>
-        <p class="virtual-list-item-media-content">{{ source.sign }}</p>
+        <h3 class="virtual-list-item-media-title">
+          {{ source.uname }}
+        </h3>
+        <p class="virtual-list-item-media-content">
+          {{ source.sign }}
+        </p>
       </div>
       <div class="virtual-list-item-media-info">
         <div v-if="!!source.liveStatus" class="virtual-list-item-media-online">
           online
-          <i class="fas fa-fire"></i>
+          <i class="fas fa-fire" />
           {{ source.online }}
         </div>
-        <div v-if="!source.liveStatus" class="virtual-list-item-media-offline">offline</div>
+        <div v-if="!source.liveStatus" class="virtual-list-item-media-offline">
+          offline
+        </div>
       </div>
       <div class="virtual-list-item-media-action">
         <a v-if="followedVtbMids.includes(source.mid)" class="virtual-list-item-media-unfollow" @click="toggleFollow(source.mid)">取关</a>
@@ -25,29 +52,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, defineComponent } from 'vue'
-
-defineComponent({
-  name: 'item-component'
-})
-
-const props = defineProps<{
-  index: number,
-  source: any,
-  followedVtbMids: Array<number>,
-  toggleFollow:(mid: number) => void,
-  enterRoom: (roomId: number) => void
-}>()
-
-const rank = computed(() => {
-  const rank = props.index + 1
-  return rank < 10 ? '0' + rank : rank
-})
-</script>
-
 <style scoped lang="scss">
-
 .virtual-list-item {
   border-bottom: #e2e2e2 solid 1px;
   list-style: none;

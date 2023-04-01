@@ -1,12 +1,13 @@
 import fetch from 'node-fetch'
+import { log } from '../utils/logger'
 
 // wrap in an promise
-function wrapRequest (url: string) {
+function wrapRequest(url: string) {
   return new Promise((resolve, reject) => {
     fetch(url).then((response) => {
-      if (response.status !== 200) {
-        reject(new Error('Invalid status code <' + response.status + '>'))
-      }
+      if (response.status !== 200)
+        reject(new Error(`Invalid status code <${response.status}>`))
+
       resolve(response.text())
     }).catch((error) => {
       reject(error)
@@ -14,22 +15,38 @@ function wrapRequest (url: string) {
   })
 }
 
+interface ResponseBody {
+  code: number
+  data: {
+    room_info: {
+      uid: number
+      room_id: number
+    }
+    anchor_info: {
+      base_info: {
+        uname: string
+        face: string
+      }
+    }
+  }
+}
+
 export class RoomService {
-  protected constructor () {
+  protected constructor() {
     // don't initiate it
   }
 
-  static async getInfoByRoom (roomid: number) {
+  static async getInfoByRoom(roomid: number) {
     const url = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomid}`
 
     const result = {
       isValid: false,
-      info: {}
+      info: {},
     }
 
     try {
       const bodyString = await wrapRequest(url) as string
-      const body = JSON.parse(bodyString)
+      const body = JSON.parse(bodyString) as ResponseBody
       const hasSuccessResponse = body && body.code === 0 && body.data
 
       if (hasSuccessResponse) {
@@ -42,21 +59,21 @@ export class RoomService {
         const uname = anchorInfo.base_info.uname
         const face = anchorInfo.base_info.face
 
-        // console.log(mid, roomId, uname, face)
-
         result.isValid = true
         Object.assign(result.info, {
           mid,
           roomid,
           uname,
-          face
+          face,
         })
-      } else {
-        // maybe invalid roomid parameter
-        console.log('invalid response')
       }
-    } catch (e) {
-      console.log(e)
+      else {
+        // maybe invalid roomid parameter
+        log.error('invalid response')
+      }
+    }
+    catch (e) {
+      log.error(JSON.stringify(e))
     }
 
     return result

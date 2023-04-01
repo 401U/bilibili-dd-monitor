@@ -1,10 +1,11 @@
-import { IpcRenderer } from 'electron'
-import { Observable, Observer } from 'rxjs'
+import type { IpcRenderer } from 'electron'
+import type { Observer } from 'rxjs'
+import { Observable } from 'rxjs'
 
 export default class SettingService {
   private ipcRenderer: IpcRenderer
 
-  constructor () {
+  constructor() {
     this.ipcRenderer = window.ipcRenderer as IpcRenderer
   }
 
@@ -43,22 +44,22 @@ export default class SettingService {
     }
   }
 
-  setIsNotifiedOnStart (isNotifiedOnStart: boolean): Observable<boolean> {
+  setIsNotifiedOnStart(isNotifiedOnStart: boolean): Observable<boolean> {
     window.ipcRenderer.send('setIsNotifiedOnStart', isNotifiedOnStart)
     return new Observable<boolean>(this.sequenceSubscriber('setIsNotifiedOnStartReply'))
   }
 
-  getIsNotifiedOnstart (): Observable<boolean> {
+  getIsNotifiedOnstart(): Observable<boolean> {
     window.ipcRenderer.send('getIsNotifiedOnStart')
     return new Observable<boolean>(this.sequenceSubscriber('getIsNotifiedOnStartReply'))
   }
 
-  getPathOfSettings (): Observable<string> {
+  getPathOfSettings(): Observable<string> {
     window.ipcRenderer.send('getPathOfSettings')
     return new Observable<string>(this.sequenceSubscriber('getPathOfSettingsReply'))
   }
 
-  openPathOfSettings (): void {
+  openPathOfSettings(): void {
     window.ipcRenderer.send('openPathOfSettings')
     // return new Observable<boolean>(this.sequenceSubscriber('openPathOfSettingsReply'))
   }

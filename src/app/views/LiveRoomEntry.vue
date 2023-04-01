@@ -1,44 +1,13 @@
-<template>
-  <div class="live-room-entry">
-    <h4 class="search-title">直播间入口</h4>
-    <p class="search-description">
-      说明：该功能作为API不可用时，或者API尚未收录某些vtuber时的一种补充策略。
-    </p>
-    <div class="search">
-      <input class="search-input" v-model="searchRoomId" type="number" placeholder="直播房间号" @keyup.enter="searchRoom" />
-      <button class="search-button" @click="searchRoom">
-        Go!
-      </button>
-    </div>
-    <div class="search-history">
-      <p class="search-history-title">历史记录</p>
-      <ul class="search-history-list">
-        <li class="search-history-list-item"
-            v-for="(info,index) in searchHistory" :key="index">
-          <img :src="info.face" class="face" alt=""/>
-          <span class="room-id" @click="enterRoom(info.roomid)">{{ info.roomid }}</span>
-          |
-          <span class="uname">{{ info.uname }}</span>
-          |
-          <button v-if="!followedVtbMids.includes(info.mid)" class="action-follow" @click="followUser(info)">关注</button>
-          <button v-else class="action-unfollow" @click="followUser(info)">取关</button>
-          |
-          <span class="delete" @click="removeSearchHistoryItem(info.roomid)">x</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { LivePlayService, SearchHistoryService, RoomService, FollowListService } from '@/app/services'
-import { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
-import { computed, defineComponent, onMounted, ref, Ref } from 'vue'
+import type { Ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import { actionNotify } from '../composables/notify'
 import { usePiniaStore } from '../store'
+import type { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
+import { FollowListService, LivePlayService, RoomService, SearchHistoryService } from '@/app/services'
 
 defineComponent({
-  name: 'LiveRoomEntry'
+  name: 'LiveRoomEntry',
 })
 
 const store = usePiniaStore()
@@ -50,16 +19,16 @@ let searchHistoryService: SearchHistoryService
 let followListService: FollowListService
 let roomService: RoomService
 
-function initServices () {
+function initServices() {
   livePlayService = new LivePlayService()
   searchHistoryService = new SearchHistoryService()
   followListService = new FollowListService()
   roomService = new RoomService()
 }
-function initData () {
+function initData() {
   searchHistory.value = searchHistoryService.get()
 }
-function searchRoom () {
+function searchRoom() {
   // validate user input
   if (searchRoomId.value === '') {
     actionNotify('warn', '直播房间号不能为空')
@@ -83,7 +52,8 @@ function searchRoom () {
       searchHistory.value = searchHistoryService.get()
       // finally, reset input
       searchRoomId.value = ''
-    } else {
+    }
+    else {
       actionNotify('warn', '添加历史记录失败，请重试')
     }
 
@@ -92,20 +62,19 @@ function searchRoom () {
   })
 }
 
-function removeSearchHistoryItem (roomId: number) {
+function removeSearchHistoryItem(roomId: number) {
   const removeSearchHistoryItemFeedback = searchHistoryService.remove(roomId)
-  if (removeSearchHistoryItemFeedback) {
+  if (removeSearchHistoryItemFeedback)
     searchHistory.value = searchHistoryService.get()
-  } else {
+  else
     actionNotify('warn', '删除历史记录失败，请重试')
-  }
 }
 
-function clearSearchHistory () {
-  searchHistoryService.clear()
-}
+// function clearSearchHistory() {
+//   searchHistoryService.clear()
+// }
 
-function followUser (info: any) {
+function followUser(info: any) {
   const followListItem = {
     mid: info.mid,
     infoSource: 'BILIBILI',
@@ -113,13 +82,13 @@ function followUser (info: any) {
     face: info.face,
     uname: info.uname,
     roomid: info.roomid,
-    sign: '==【该关注用户通过手动模式添加：简介暂时无法获取】=='
+    sign: '==【该关注用户通过手动模式添加：简介暂时无法获取】==',
   }
   followListService.toggleFollow(followListItem).subscribe((followLists) => {
     store.followLists = followLists
   })
 }
-function enterRoom (roomId: number) {
+function enterRoom(roomId: number) {
   livePlayService.enterRoom(roomId)
 }
 
@@ -128,6 +97,48 @@ onMounted(() => {
   initData()
 })
 </script>
+
+<template>
+  <div class="live-room-entry">
+    <h4 class="search-title">
+      直播间入口
+    </h4>
+    <p class="search-description">
+      说明：该功能作为API不可用时，或者API尚未收录某些vtuber时的一种补充策略。
+    </p>
+    <div class="search">
+      <input v-model="searchRoomId" class="search-input" type="number" placeholder="直播房间号" @keyup.enter="searchRoom">
+      <button class="search-button" @click="searchRoom">
+        Go!
+      </button>
+    </div>
+    <div class="search-history">
+      <p class="search-history-title">
+        历史记录
+      </p>
+      <ul class="search-history-list">
+        <li
+          v-for="(info, index) in searchHistory"
+          :key="index" class="search-history-list-item"
+        >
+          <img :src="info.face" class="face" alt="">
+          <span class="room-id" @click="enterRoom(info.roomid)">{{ info.roomid }}</span>
+          |
+          <span class="uname">{{ info.uname }}</span>
+          |
+          <button v-if="!followedVtbMids.includes(info.mid)" class="action-follow" @click="followUser(info)">
+            关注
+          </button>
+          <button v-else class="action-unfollow" @click="followUser(info)">
+            取关
+          </button>
+          |
+          <span class="delete" @click="removeSearchHistoryItem(info.roomid)">x</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .search {

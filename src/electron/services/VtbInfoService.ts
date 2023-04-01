@@ -1,7 +1,13 @@
+import type { Socket } from 'socket.io-client'
 import io from 'socket.io-client'
-import { FollowList, VtbInfo } from '@/interfaces'
-import { FollowListService } from './index'
 import vtbInfosMock from '../../../test/sample/VtbInfos.json'
+import { log } from '../utils/logger'
+import { FollowListService } from './index'
+import type { FollowList, VtbInfo } from '@/interfaces'
+
+function _compareByOnlineDesc(vtbInfoA: VtbInfo, vtbInfoB: VtbInfo): number {
+  return vtbInfoB.online - vtbInfoA.online
+}
 
 export class VtbInfoService {
   private vtbInfosMap: Map<number, VtbInfo> = new Map<number, VtbInfo>()
@@ -12,7 +18,7 @@ export class VtbInfoService {
   // if backend server uses a self signed certificate, need to config `rejectUnauthorized: false`.
   private defaultSocketOptions = { transports: ['websocket'], rejectUnauthorized: false }
 
-  constructor (bestCDN: string) {
+  constructor(bestCDN: string) {
     this.socketIOUrl = bestCDN
 
     // init socket.IO
@@ -22,8 +28,8 @@ export class VtbInfoService {
     // this._initMockData()
   }
 
-  initSocketIO () {
-    console.log('Socket.io url: ', this.socketIOUrl)
+  initSocketIO() {
+    log.debug(`Socket.io url: ${this.socketIOUrl}`)
     const socket = io(this.socketIOUrl, this.defaultSocketOptions)
 
     let totalTimeInterval = 0
@@ -39,14 +45,13 @@ export class VtbInfoService {
       const averageUpdateInterval = Math.round(totalTimeInterval / infoEventCount)
 
       // insert or update info
-      infos.forEach((info: VtbInfo, index, array) => {
+      infos.forEach((info: VtbInfo, _index, _array) => {
         this.vtbInfosMap.set(info.mid, info)
       })
 
       // if have update function, call it
-      if (this.update) {
+      if (this.update)
         this.update([...this.vtbInfosMap.values()], infos, averageUpdateInterval)
-      }
 
       // if has once update function, call it and reset to null
       if (this._onceUpdate) {
@@ -58,81 +63,78 @@ export class VtbInfoService {
     this.listenSocketEvent(socket)
   }
 
-  listenSocketEvent (socket: any) {
+  listenSocketEvent(socket: Socket) {
     // region socket listeners
     if (socket) {
       socket.on('connect', () => {
-        console.log('socket.io connect.')
+        log.debug('socket.io connect.')
       })
       socket.on('disconnect', () => {
-        console.log('socket.io disconnect.')
+        log.debug('socket.io disconnect.')
       })
       socket.on('reconnecting', () => {
-        console.log('reconnecting')
+        log.debug('reconnecting')
       })
       socket.on('reconnect_error', (error: any) => {
-        console.log('reconnect_error', error)
+        log.error(`reconnect_error ${JSON.stringify(error)}`)
       })
       socket.on('connect_error', (error: any) => {
-        console.log('connect_error', error)
+        log.error(`connect_error ${JSON.stringify(error)}`)
       })
       socket.on('connect_timeout', (timeout: any) => {
-        console.log('connect_timeout', timeout)
+        log.error(`connect_timeout ${JSON.stringify(timeout)}`)
       })
       socket.on('error', (error: any) => {
-        console.log('error', error)
+        log.error(`socket.io error ${JSON.stringify(error)}`)
       })
     }
     // endregion
   }
 
-  _initMockData () {
+  _initMockData() {
     vtbInfosMock.forEach((info: VtbInfo) => {
       this.vtbInfosMap.set(info.mid, info)
     })
   }
 
-  stopUpdate () {
+  stopUpdate() {
     this.update = null
   }
 
-  onceUpdate (callback: (vtbInfos: VtbInfo[]) => void) {
+  onceUpdate(callback: (vtbInfos: VtbInfo[]) => void) {
     this._onceUpdate = callback
   }
 
-  onUpdate (callback: (allVtbInfos: VtbInfo[], updatedVtbInfos: VtbInfo[], averageUpdateInterval: number) => void) {
+  onUpdate(callback: (allVtbInfos: VtbInfo[], updatedVtbInfos: VtbInfo[], averageUpdateInterval: number) => void) {
     this.update = callback
   }
 
-  getVtbInfos (): VtbInfo[] {
-    return [...this.vtbInfosMap.values()].sort(this._compareByOnlineDesc)
+  getVtbInfos(): VtbInfo[] {
+    return [...this.vtbInfosMap.values()].sort(_compareByOnlineDesc)
   }
 
-  getVtbLiveStatusByMid (vtbMid: number): boolean {
+  getVtbLiveStatusByMid(vtbMid: number): boolean {
     const vtbInfo = this.getVtbInfos().find((vtbInfo: VtbInfo) => vtbInfo.mid === vtbMid)
-    if (vtbInfo) return !!vtbInfo.liveStatus
+    if (vtbInfo)
+      return !!vtbInfo.liveStatus
     return false
   }
 
   /**
    * get followed vtb infos
    */
-  getFollowedVtbInfos (): VtbInfo[] {
+  getFollowedVtbInfos(): VtbInfo[] {
     let followedVtbInfos: VtbInfo[] = []
     const vtbInfos = this.getVtbInfos()
     FollowListService.getFollowListsSync().forEach((followList: FollowList) => {
       followedVtbInfos = [
         ...followedVtbInfos,
         ...vtbInfos.filter((vtbInfo) => {
-          const followMids = [...followList.list.map((item) => item.mid)]
+          const followMids = [...followList.list.map(item => item.mid)]
           return followMids.includes(vtbInfo.mid)
-        })
+        }),
       ]
     })
-    return followedVtbInfos.sort(this._compareByOnlineDesc)
-  }
-
-  _compareByOnlineDesc (vtbInfoA: VtbInfo, vtbInfoB: VtbInfo): number {
-    return vtbInfoB.online - vtbInfoA.online
+    return followedVtbInfos.sort(_compareByOnlineDesc)
   }
 }
