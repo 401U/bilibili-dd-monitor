@@ -77,10 +77,13 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { ipcRenderer } from 'electron'
 import VueShield from '@/app/components/VueShield.vue'
 import { computed, ComputedRef, Ref } from 'vue'
 import { UpdateInfo } from 'electron-updater'
+import { FollowList } from '@/interfaces'
+import { NoticeListener, FollowListService, VtbInfoUpdateListener, PlayerWindowCountListener, CDNListener, AppUpdateListener } from './services'
+import store from './store'
+import { slog } from './utils/helpers'
 
 const vtbCount: ComputedRef<number> = computed(() => useStore().getters.vtbCount)
 const livingVtbCount: ComputedRef<number> = computed(() => useStore().getters.livingVtbCount)
@@ -100,13 +103,30 @@ function subIsActive (routePath: string | string[]): boolean {
 function handleClickOK () {
   // here should lock UI
   useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
-  // ipcRenderer.send('user-confirm-download')
+  // window.api.ipcRenderer.send('user-confirm-download')
   // here should unlock UI
   // (doge 这里更好的做法是锁UI，防止重复的快速点击
 }
 function handleClickCancel () {
   useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
 }
+
+console.log('window.ipcRenderer is', window.ipcRenderer)
+const noticeService = new NoticeListener()
+slog('INIT', 'NoticeService')
+const followListService = new FollowListService()
+followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
+  slog('INIT', 'followlists')
+  store.dispatch('updateFollowLists', followLists)
+})
+const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+slog('INIT', 'VtbInfoUpdateListener')
+const playerWindowCountListener = new PlayerWindowCountListener()
+slog('INIT', 'PlayerWindowCountListener')
+const cdnListener = new CDNListener()
+slog('INIT', 'CDNListener')
+const appUpdateListener = new AppUpdateListener()
+slog('INIT', 'appUpdateListener')
 </script>
 
 <style lang="scss">

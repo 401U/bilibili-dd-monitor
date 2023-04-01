@@ -2,20 +2,18 @@ import { IpcRenderer } from 'electron'
 import store from '../../store'
 import { Store } from 'vuex'
 
-declare const window: any
-
 export default class PlayerWindowCountListener {
   private ipcRenderer: IpcRenderer
   private store: Store<object>
 
   constructor () {
-    this.ipcRenderer = window.ipcRenderer
+    this.ipcRenderer = window.ipcRenderer as IpcRenderer
     this.store = store
     this.initPlayerWindowCountListener()
   }
 
   initPlayerWindowCountListener () {
-    this.ipcRenderer.on('updatePlayerWindowCount', (event: Electron.Event, count: number) => {
+    window.ipcRenderer.on('updatePlayerWindowCount', (event: Electron.Event, count: number) => {
       this.store.dispatch('updatePlayerWindowCount', count)
     })
   }

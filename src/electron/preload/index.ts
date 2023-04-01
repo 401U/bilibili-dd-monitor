@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron'
+import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 
 function domReady (condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
@@ -84,16 +84,27 @@ function useLoading () {
 
 // ----------------------------------------------------------------------
 
-// const { appendLoading, removeLoading } = useLoading()
-// domReady().then(appendLoading)
+const { appendLoading, removeLoading } = useLoading()
+domReady().then(appendLoading)
 
-// window.onmessage = (ev) => {
-//   ev.data.payload === 'removeLoading' && removeLoading()
-// }
+window.onmessage = (ev) => {
+  ev.data.payload === 'removeLoading' && removeLoading()
+}
 
-// setTimeout(removeLoading, 4999)
-console.log('trigger preload')
-Object.assign(window, {
-  ipcRenderer
-})
-console.log('done preload')
+setTimeout(removeLoading, 4999)
+
+// contextBridge.exposeInMainWorld(
+//   'api', {
+//     ipcRenderer
+//   }
+// )
+
+contextBridge.exposeInMainWorld(
+  'ipcRenderer', {
+    on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on(channel, listener),
+    once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.once(channel, listener),
+    send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args)
+  }
+)
+
+console.log('hit preload')

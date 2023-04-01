@@ -2,7 +2,6 @@ import { IpcRenderer } from 'electron'
 import { Observable, Observer } from 'rxjs'
 import { FollowList, FollowListItem } from '@/interfaces'
 
-declare const window: any
 /**
  * refactor to singleton
  */
@@ -10,56 +9,56 @@ export default class FollowListService {
   private ipcRenderer: IpcRenderer
 
   constructor () {
-    this.ipcRenderer = window.ipcRenderer
+    this.ipcRenderer = window.ipcRenderer as IpcRenderer
   }
 
   private sequenceSubscriber = (channel: string) => {
     return (observer: Observer<any>) => {
       switch (channel) {
         case 'getFollowListsReply': {
-          this.ipcRenderer.once('getFollowListsReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('getFollowListsReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
           break
         }
         case 'addFollowListReply': {
-          this.ipcRenderer.once('addFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('addFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
           break
         }
         case 'deleteFollowListReply': {
-          this.ipcRenderer.once('deleteFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('deleteFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
           break
         }
         case 'renameFollowListReply': {
-          this.ipcRenderer.once('renameFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('renameFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
           break
         }
         case 'toggleFollowReply': {
-          this.ipcRenderer.once('toggleFollowReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('toggleFollowReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
           break
         }
         // case 'followByRoomInfoReply': {
-        //   this.ipcRenderer.once('followByRoomInfoReply', (e: Electron.IpcRendererEvent, flag: boolean) => {
+        //   window.ipcRenderer.once('followByRoomInfoReply', (e: Electron.IpcRendererEvent, flag: boolean) => {
         //     observer.next(flag)
         //     observer.complete()
         //   })
         //   break
         // }
         case 'setFollowListReply': {
-          this.ipcRenderer.once('setFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
+          window.ipcRenderer.once('setFollowListReply', (e: Electron.IpcRendererEvent, followLists: FollowList[]) => {
             observer.next(followLists)
             observer.complete()
           })
@@ -73,7 +72,7 @@ export default class FollowListService {
    * get all follow list
    */
   getFollowLists (): Observable<FollowList[]> {
-    this.ipcRenderer.send('getFollowLists')
+    window.ipcRenderer.send('getFollowLists')
     return new Observable<FollowList[]>(this.sequenceSubscriber('getFollowListsReply'))
   }
 
@@ -82,7 +81,7 @@ export default class FollowListService {
    * @param name
    */
   addFollowList (name: string): Observable<FollowList[]> {
-    this.ipcRenderer.send('addFollowList', name)
+    window.ipcRenderer.send('addFollowList', name)
     return new Observable<FollowList[]>(this.sequenceSubscriber('addFollowListReply'))
   }
 
@@ -91,7 +90,7 @@ export default class FollowListService {
    * @param id
    */
   deleteFollowList (id: number): Observable<FollowList[]> {
-    this.ipcRenderer.send('deleteFollowList', id)
+    window.ipcRenderer.send('deleteFollowList', id)
     return new Observable<FollowList[]>(this.sequenceSubscriber('deleteFollowListReply'))
   }
 
@@ -101,7 +100,7 @@ export default class FollowListService {
    * @param newName
    */
   renameFollowList (id: number, newName: string): Observable<FollowList[]> {
-    this.ipcRenderer.send('renameFollowList', id, newName)
+    window.ipcRenderer.send('renameFollowList', id, newName)
     return new Observable<FollowList[]>(this.sequenceSubscriber('renameFollowListReply'))
   }
 
@@ -110,12 +109,12 @@ export default class FollowListService {
    * @param followListItem
    */
   toggleFollow (followListItem: FollowListItem): Observable<FollowList[]> {
-    this.ipcRenderer.send('toggleFollow', followListItem)
+    window.ipcRenderer.send('toggleFollow', followListItem)
     return new Observable<FollowList[]>(this.sequenceSubscriber('toggleFollowReply'))
   }
 
   // followByRoomInfo (info: any) {
-  //   this.ipcRenderer.send('followByRoomInfo', info)
+  //   window.ipcRenderer.send('followByRoomInfo', info)
   //   return new Observable<FollowList[]>(this.sequenceSubscriber('followByRoomInfoReply'))
   // }
 
@@ -125,7 +124,7 @@ export default class FollowListService {
    * @param listId
    */
   addItemsToFollowList (followListItems: FollowListItem[], listId: number): Observable<FollowList[]> {
-    this.ipcRenderer.send('setFollowList', followListItems, listId)
+    window.ipcRenderer.send('setFollowList', followListItems, listId)
     return new Observable<FollowList[]>(this.sequenceSubscriber('setFollowListReply'))
   }
 }

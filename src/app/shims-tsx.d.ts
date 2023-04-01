@@ -1,3 +1,4 @@
+import { IpcRenderer } from 'electron'
 import Vue, { VNode } from 'vue'
 
 declare global {
@@ -9,5 +10,10 @@ declare global {
     interface IntrinsicElements {
       [elem: string]: any;
     }
+  }
+  namespace ipcRenderer {
+    const on: (channel: string, listener: (...args: any[]) => void) => void
+    const once: (channel: string, listener: (...args: any[]) => void) => void
+    const send: (channel: string, ...args: any[]) => void
   }
 }
