@@ -78,7 +78,7 @@
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import VueShield from '@/app/components/VueShield.vue'
-import { computed, ComputedRef, Ref } from 'vue'
+import { computed, ComputedRef, onMounted, Ref } from 'vue'
 import { UpdateInfo } from 'electron-updater'
 import { FollowList } from '@/interfaces'
 import { NoticeListener, FollowListService, VtbInfoUpdateListener, PlayerWindowCountListener, CDNListener, AppUpdateListener } from './services'
@@ -111,22 +111,19 @@ function handleClickCancel () {
   useStore().dispatch('toggleShowUpdateAvailableModal', updateInfo)
 }
 
-console.log('window.ipcRenderer is', window.ipcRenderer)
-const noticeService = new NoticeListener()
-slog('INIT', 'NoticeService')
-const followListService = new FollowListService()
-followListService.getFollowLists().subscribe((followLists: FollowList[]) => {
-  slog('INIT', 'followlists')
-  store.dispatch('updateFollowLists', followLists)
+onMounted(() => {
+  const noticeService = new NoticeListener()
+  slog('INIT', 'NoticeService')
+  const followListService = new FollowListService()
+  const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
+  slog('INIT', 'VtbInfoUpdateListener')
+  const playerWindowCountListener = new PlayerWindowCountListener()
+  slog('INIT', 'PlayerWindowCountListener')
+  const cdnListener = new CDNListener()
+  slog('INIT', 'CDNListener')
+  const appUpdateListener = new AppUpdateListener()
+  slog('INIT', 'appUpdateListener')
 })
-const vtbInfoUpdateListenerService = new VtbInfoUpdateListener()
-slog('INIT', 'VtbInfoUpdateListener')
-const playerWindowCountListener = new PlayerWindowCountListener()
-slog('INIT', 'PlayerWindowCountListener')
-const cdnListener = new CDNListener()
-slog('INIT', 'CDNListener')
-const appUpdateListener = new AppUpdateListener()
-slog('INIT', 'appUpdateListener')
 </script>
 
 <style lang="scss">

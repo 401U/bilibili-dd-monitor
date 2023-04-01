@@ -55,7 +55,7 @@ export class VtbInfoService {
       }
     })
 
-    // this.listenSocketEvent(socket)
+    this.listenSocketEvent(socket)
   }
 
   listenSocketEvent (socket: any) {

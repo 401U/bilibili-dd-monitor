@@ -1,15 +1,12 @@
-import { IpcRenderer } from 'electron'
+import store from '@/app/store'
 import { VtbInfo } from '@/interfaces'
-import store from '../../store'
-import { Store } from 'vuex'
+import { Store, useStore } from 'vuex'
 
 export default class VtbInfoUpdateListener {
-  private ipcRenderer: IpcRenderer
   private store: Store<object>
 
   constructor () {
-    this.ipcRenderer = window.ipcRenderer as IpcRenderer
-    this.store = store
+    this.store = useStore()
     this.initVtbInfosUpdateListener()
   }
 

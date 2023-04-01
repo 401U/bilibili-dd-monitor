@@ -1,17 +1,14 @@
-import { IpcRenderer } from 'electron'
-import { Store } from 'vuex'
-import store from '../../store'
+import { Store, useStore } from 'vuex'
 import { UpdateInfo } from 'electron-updater'
 import { ProgressInfo } from 'builder-util-runtime'
 import { slog } from '@/app/utils/helpers'
+import store from '@/app/store'
 
 export default class AppUpdateListener {
-  private ipcRenderer: IpcRenderer
   private store: Store<object>
 
   constructor () {
-    this.ipcRenderer = window.ipcRenderer as IpcRenderer
-    this.store = store
+    this.store = useStore()
     this.initDownloadProgressListener()
     this.initUpdateAvailableListener()
   }

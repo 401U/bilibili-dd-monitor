@@ -1,15 +1,27 @@
 import { IpcRenderer } from 'electron'
 import { Observable, Observer } from 'rxjs'
 import { FollowList, FollowListItem } from '@/interfaces'
+import { slog } from '@/app/utils/helpers'
+import { Store, useStore } from 'vuex'
 
 /**
  * refactor to singleton
  */
 export default class FollowListService {
   private ipcRenderer: IpcRenderer
+  private store: Store<any>
 
   constructor () {
+    this.store = useStore()
     this.ipcRenderer = window.ipcRenderer as IpcRenderer
+    this.initService()
+  }
+
+  initService () {
+    this.getFollowLists().subscribe((followLists: FollowList[]) => {
+      slog('INIT', 'followlists')
+      this.store.dispatch('updateFollowLists', followLists)
+    })
   }
 
   private sequenceSubscriber = (channel: string) => {
