@@ -222,6 +222,10 @@ async function initMainWindow () {
   }
 }
 
+// disable GPU
+app.commandLine.appendSwitch('ignore-gpu-blacklist')
+app.commandLine.appendSwitch('disable-gpu')
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // GC tray

@@ -35,8 +35,8 @@ export async function createMainWindow (app: Electron.App, playerObjMap: Context
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
-      contextIsolation: false,
-      webSecurity: false // fix connect_error Error: websocket error
+      contextIsolation: true,
+      webSecurity: true // fix connect_error Error: websocket error
     }
   })
   if (process.env.VITE_DEV_SERVER_URL) {
