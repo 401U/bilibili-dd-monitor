@@ -8,20 +8,26 @@ import { usePiniaStore } from '@/app/store'
 import FollowListItem from '@/app/components/FollowListItem.vue'
 import type { FollowList, VtbInfo } from '@/interfaces'
 
+const props = defineProps<{
+  id: string
+}>()
+
 let followListService: FollowListService
 let livePlayService: LivePlayService
 const store = usePiniaStore()
 const isSetListModalVisible = ref(false)
 const selectedListId = ref(-1)
 const isSetListModalSuccessLoading = ref(false)
-const activeListId = ref(-1)
+const activeListId = computed(() => {
+  return parseInt(props.id) || -1
+})
 const selectedVtbInfo: Ref<VtbInfo | undefined> = ref()
 
 const followLists = computed(() => store.followLists)
 const followedVtbInfos = computed(() => store.followedVtbInfos)
 
 const activeFollowList = computed(() => {
-  let activeFollowList = {} as FollowList
+  let result = {} as FollowList
   // handle "全部关注"
   if (activeListId.value === -1) {
     const allFollow: FollowList = {
@@ -30,16 +36,16 @@ const activeFollowList = computed(() => {
       list: [],
     }
     followLists.value.forEach(followList => allFollow.list.push(...followList.list))
-    activeFollowList = allFollow
+    result = allFollow
   }
   else {
     // handle listId >=0
     followLists.value.forEach((followList) => {
       if (followList.id === activeListId.value)
-        activeFollowList = followList
+        result = followList
     })
   }
-  return activeFollowList
+  return result
 })
 
 const activeFollowedVtbInfos = computed(() => {

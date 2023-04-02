@@ -17,6 +17,7 @@ const routes = [
       {
         path: '/list/:id',
         component: () => import('../components/FollowList.vue'),
+        props: true,
       },
     ],
   },
