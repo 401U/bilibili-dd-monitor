@@ -90,7 +90,13 @@ function getActiveFollowListItem(mid: number) {
 
 function toggleFollow(mid: number) {
   const activeFollowListItem = getActiveFollowListItem(mid)[0]
-  followListService.toggleFollow(activeFollowListItem).subscribe((followLists) => {
+
+  // activeFollowListItem 是一个Proxy, 直接送到 followListService 中会报错
+  followListService.toggleFollow({
+    mid: activeFollowListItem.mid,
+    infoSource: activeFollowListItem.infoSource,
+    updateMethod: activeFollowListItem.updateMethod,
+  }).subscribe((followLists) => {
     store.followLists = followLists
   })
 }
@@ -120,7 +126,7 @@ initServices()
           :active="active"
         >
           <FollowListItem
-            :index="index"
+            :index="item.mid"
             :source="item"
             :toggle-follow="toggleFollow"
             :enter-room="enterRoom"

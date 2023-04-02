@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { defineComponent } from 'vue'
 import type { VtbInfo } from '@/interfaces'
+import { log } from '@/electron/utils/logger'
 
-defineProps<{
-  index: number
+const props = defineProps<{
   source: VtbInfo
   toggleFollow: (mid: number) => void
   enterRoom: (roomId: number) => void
@@ -17,6 +17,11 @@ defineComponent({
 function getSignCSSClass(source: any) {
   const isManualSignInfo = source.updateMethod === 'MANUAL'
   return isManualSignInfo ? 'manual-sign-warn' : ''
+}
+
+function unfollow() {
+  log.info(`unfollow ${props.source.mid}`)
+  props.toggleFollow(props.source.mid)
 }
 </script>
 
@@ -33,7 +38,7 @@ function getSignCSSClass(source: any) {
         </p>
       </div>
       <div class="virtual-list-item-media-action">
-        <a class="virtual-list-item-media-unfollow" @click="toggleFollow(source.mid)">取关</a>
+        <a class="virtual-list-item-media-unfollow" @click="unfollow">取关</a>
         |
         <a class="virtual-list-item-media-enter-room" @click="enterRoom(source.roomid!)">进入直播间</a>
         |
