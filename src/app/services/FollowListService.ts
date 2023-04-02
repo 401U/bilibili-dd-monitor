@@ -119,7 +119,7 @@ export default class FollowListService {
    * @param followListItem
    */
   toggleFollow(followListItem: FollowListItem): Observable<FollowList[]> {
-    window.ipcRenderer.send('toggleFollow', JSON.stringify(followListItem))
+    window.ipcRenderer.send('toggleFollow', followListItem)
     return new Observable<FollowList[]>(this.sequenceSubscriber('toggleFollowReply'))
   }
 

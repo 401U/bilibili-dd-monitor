@@ -5,6 +5,7 @@ import { actionNotify } from '../composables/notify'
 import { usePiniaStore } from '@/app/store'
 import { FollowListService } from '@/app/services'
 const store = usePiniaStore()
+const router = useRouter()
 const mouseOverListId = ref(-1) // 我的关注 = 全部关注
 const mouseHoveringListId = ref(-1)
 const createListModalValue = ref('') // 创建分组的对话框的文本值
@@ -20,9 +21,9 @@ const followListService = new FollowListService()
 
 function handleRouterChange() {
   // fix case NavigationDuplicated: Avoided redundant navigation to current location
-  const currentRoutePath = useRouter().currentRoute.value.path
+  const currentRoutePath = router.currentRoute.value.path
   if (!currentRoutePath.includes('-1'))
-    useRouter().replace('/list/-1')
+    router.replace('/list/-1')
 }
 
 function isEmpty(str: string) {

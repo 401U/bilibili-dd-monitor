@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, defineComponent } from 'vue'
+import type { VtbInfo } from '@/interfaces'
 
 const props = defineProps<{
   index: number
-  source: any
+  source: VtbInfo
   followedVtbMids: Array<number>
   toggleFollow: (mid: number) => void
   enterRoom: (roomId: number) => void
@@ -13,16 +14,20 @@ defineComponent({
   name: 'ItemComponent',
 })
 
+function doFollow() {
+  props.toggleFollow(props.source.mid)
+}
+
 const rank = computed(() => {
   const rank = props.index + 1
-  return rank < 10 ? `0${rank}` : rank
+  return rank < 10 ? `0${rank}` : rank.toString()
 })
 </script>
 
 <template>
   <div :key="source.mid" class="virtual-list-item" :class="[`rank-${rank}`]">
     <div class="virtual-list-item-media">
-      <span v-if="rank <= 10" class="virtual-list-item-rank">NO.{{ rank }}</span>
+      <span v-if="parseInt(rank) <= 10" class="virtual-list-item-rank">NO.{{ rank }}</span>
       <img loading="lazy" class="virtual-list-item-media-avatar" width="40" height="40" :src="source.face" alt="">
       <div class="virtual-list-item-media-body">
         <h3 class="virtual-list-item-media-title">
@@ -43,10 +48,10 @@ const rank = computed(() => {
         </div>
       </div>
       <div class="virtual-list-item-media-action">
-        <a v-if="followedVtbMids.includes(source.mid)" class="virtual-list-item-media-unfollow" @click="toggleFollow(source.mid)">取关</a>
-        <a v-if="!followedVtbMids.includes(source.mid)" class="virtual-list-item-media-follow" @click="toggleFollow(source.mid)">关注</a>
+        <a v-if="followedVtbMids.includes(source.mid)" class="virtual-list-item-media-unfollow" @click="doFollow">取关</a>
+        <a v-if="!followedVtbMids.includes(source.mid)" class="virtual-list-item-media-follow" @click="doFollow">关注</a>
         |
-        <a class="virtual-list-item-media-enter-room" @click="enterRoom(source.roomid)">进入直播间</a>
+        <a class="virtual-list-item-media-enter-room" @click="enterRoom(source.roomid!)">进入直播间</a>
       </div>
     </div>
   </div>
