@@ -47,7 +47,7 @@ function searchRoom() {
     const roomIdCopy = searchRoomId
 
     // add search history item
-    const addFeedback = searchHistoryService.add(result.info)
+    const addFeedback = searchHistoryService.add(result.info as SearchHistoryItem)
     if (addFeedback) {
       searchHistory.value = searchHistoryService.get()
       // finally, reset input

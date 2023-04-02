@@ -1,5 +1,5 @@
 import { usePiniaStore } from '@/app/store'
-import { log } from '@/electron/utils/logger'
+import { log } from '@/app/composables/logger'
 
 export default class VtbInfoUpdateListener {
   private store

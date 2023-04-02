@@ -3,29 +3,16 @@
   "version": "0.10.3",
   "private": true,
   "description": "bilibili-dd-monitor desktop app.",
-  "author": "wdpm",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint ./src",
-    "lintf": "eslint ./src --fix",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:build-win": "vue-cli-service electron:build -w",
-    "electron:build-mac": "vue-cli-service electron:build -m",
-    "electron:build-linux": "vue-cli-service electron:build -l",
-    "electron:serve": "vue-cli-service electron:serve",
-    "electron:publish": "vue-cli-service electron:build -p always",
-    "electron:publish-win": "vue-cli-service electron:build -w -p always",
-    "electron:publish-mac": "vue-cli-service electron:build -m -p always",
-    "electron:publish-linux": "vue-cli-service electron:build -l -p always",
-    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=public --flatten",
-    "release": "vue-cli-service electron:build -mwl -p always",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
-  },
+  "author": "wdpm <1137299673@qq.com>",
   "main": "dist-electron/main/index.js",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "lint": "eslint ./src",
+    "lintf": "eslint ./src --fix"
   },
   "debug": {
     "env": {
@@ -77,6 +64,7 @@
     "vite-plugin-electron": "^0.11.1",
     "vite-plugin-electron-renderer": "^0.13.13",
     "vue": "^3.2.47",
-    "vue-template-compiler": "^2.7.14"
+    "vue-template-compiler": "^2.7.14",
+    "vue-tsc": "^1.2.0"
   }
 }

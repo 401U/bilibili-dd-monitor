@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineComponent } from 'vue'
 import type { VtbInfo } from '@/interfaces'
-import { log } from '@/electron/utils/logger'
+import { log } from '@/app/composables/logger'
 
 const props = defineProps<{
   source: VtbInfo
