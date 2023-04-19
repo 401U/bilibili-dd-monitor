@@ -163,10 +163,12 @@ function initIpcMainListeners() {
           return vtbInfo.roomid === roomid
         })!
 
+        const title = (vtbInfo && vtbInfo.title) || (vtbInfo && `${vtbInfo.uname!}的直播间`) || `${roomid}的直播间`
+
         // player need `face`, `roomid`, `title`(optional) field
         const vtbInfoNeed = {
           roomid,
-          title: (vtbInfo && vtbInfo.title) || '',
+          title,
           face: (vtbInfo && vtbInfo.face) || '',
         }
 
