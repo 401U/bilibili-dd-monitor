@@ -1,8 +1,8 @@
 import type { Observer } from 'rxjs'
 import { Observable } from 'rxjs'
 import type { FollowList, FollowListItem } from '@/interfaces'
-import { slog } from '@/app/utils/helpers'
-import { usePiniaStore } from '@/app/store'
+import { slog } from '@/utils/helpers'
+import { usePiniaStore } from '@/store'
 
 /**
  * refactor to singleton

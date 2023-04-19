@@ -29,11 +29,11 @@ import Notifications from '@kyvg/vue3-notification'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { createPinia } from 'pinia'
-import { AppUpdateListener, CDNListener, FollowListService, NoticeListener, PlayerWindowCountListener, VtbInfoUpdateListener } from './app/services'
-import OrbitSpinner from '@/app/components/OrbitSpinner.vue'
-import { slog } from '@/app/utils/helpers'
-import App from '@/app/App.vue'
-import router from '@/app/router'
+import { AppUpdateListener, CDNListener, FollowListService, NoticeListener, PlayerWindowCountListener, VtbInfoUpdateListener } from '@/services'
+import OrbitSpinner from '@/components/OrbitSpinner.vue'
+import { slog } from '@/utils/helpers'
+import App from '@/App.vue'
+import router from '@/router'
 
 library.add(
   faSignal,

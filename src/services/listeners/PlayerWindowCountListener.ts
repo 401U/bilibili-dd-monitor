@@ -1,4 +1,4 @@
-import { usePiniaStore } from '@/app/store'
+import { usePiniaStore } from '@/store'
 
 export default class PlayerWindowCountListener {
   private store

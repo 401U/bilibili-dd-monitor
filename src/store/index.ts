@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { _compareByOnlineDesc } from '@/app/utils/helpers'
+import { _compareByOnlineDesc } from '@/utils/helpers'
 import type { FollowList, FollowListItem, VtbInfo } from '@/interfaces'
 
 export const usePiniaStore = defineStore('pinia', () => {

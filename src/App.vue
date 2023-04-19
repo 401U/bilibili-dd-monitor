@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 import { usePiniaStore } from './store'
-import VueShield from '@/app/components/VueShield.vue'
+import VueShield from '@/components/VueShield.vue'
 const store = usePiniaStore()
 
 const vtbCount = computed(() => store.vtbCount)

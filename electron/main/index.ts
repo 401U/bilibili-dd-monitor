@@ -1,5 +1,3 @@
-'use strict'
-
 import path from 'node:path'
 import type { IpcMainEvent } from 'electron'
 import { BrowserWindow, Menu, Tray, app, ipcMain, protocol } from 'electron'

@@ -1,6 +1,6 @@
 import type { Socket } from 'socket.io-client'
 import io from 'socket.io-client'
-import vtbInfosMock from '../../../test/sample/VtbInfos.json'
+import vtbInfosMock from '../../test/sample/VtbInfos.json'
 import { log } from '../utils/logger'
 import { FollowListService } from './index'
 import type { FollowList, VtbInfo } from '@/interfaces'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineComponent } from 'vue'
 import { usePiniaStore } from '../store'
-import { LivePlayService } from '@/app/services'
+import { LivePlayService } from '@/services'
 import type { VtbInfo } from '@/interfaces'
 let livePlayService: LivePlayService
 defineComponent({

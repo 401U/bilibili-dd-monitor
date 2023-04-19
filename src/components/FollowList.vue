@@ -3,9 +3,9 @@ import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import { actionNotify } from '../composables/notify'
-import { FollowListService, LivePlayService } from '@/app/services'
-import { usePiniaStore } from '@/app/store'
-import FollowListItem from '@/app/components/FollowListItem.vue'
+import { FollowListService, LivePlayService } from '@/services'
+import { usePiniaStore } from '@/store'
+import FollowListItem from '@/components/FollowListItem.vue'
 import type { FollowList, VtbInfo } from '@/interfaces'
 
 const props = defineProps<{

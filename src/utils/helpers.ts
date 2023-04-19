@@ -1,4 +1,3 @@
-import chalk from 'chalk'
 import type { VtbInfo } from '@/interfaces'
 
 export function slog(title: any, content: any): void {

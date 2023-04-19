@@ -1,7 +1,7 @@
 import type { UpdateInfo } from 'electron-updater'
 import type { ProgressInfo } from 'builder-util-runtime'
-import { slog } from '@/app/utils/helpers'
-import { usePiniaStore } from '@/app/store'
+import { slog } from '@/utils/helpers'
+import { usePiniaStore } from '@/store'
 
 export default class AppUpdateListener {
   private store

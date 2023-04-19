@@ -4,9 +4,9 @@ import type { Ref } from 'vue'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import { usePiniaStore } from '../store'
-import VtbListItem from '@/app/components/VtbListItem.vue'
-import { FollowListService, LivePlayService } from '@/app/services/index'
-import { _compareByOnlineDesc } from '@/app/utils/helpers'
+import VtbListItem from '@/components/VtbListItem.vue'
+import { FollowListService, LivePlayService } from '@/services/index'
+import { _compareByOnlineDesc } from '@/utils/helpers'
 import type { VtbInfo } from '@/interfaces'
 
 defineComponent({

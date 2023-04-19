@@ -4,7 +4,7 @@ import { computed, defineComponent, onMounted, ref } from 'vue'
 import { actionNotify } from '../composables/notify'
 import { usePiniaStore } from '../store'
 import type { SearchHistoryItem } from '@/interfaces/SearchHistoryItem'
-import { FollowListService, LivePlayService, RoomService, SearchHistoryService } from '@/app/services'
+import { FollowListService, LivePlayService, RoomService, SearchHistoryService } from '@/services'
 
 defineComponent({
   name: 'LiveRoomEntry',

@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { actionNotify } from '../composables/notify'
-import { usePiniaStore } from '@/app/store'
-import { FollowListService } from '@/app/services'
+import { usePiniaStore } from '@/store'
+import { FollowListService } from '@/services'
 const store = usePiniaStore()
 const router = useRouter()
 const mouseOverListId = ref(-1) // 我的关注 = 全部关注

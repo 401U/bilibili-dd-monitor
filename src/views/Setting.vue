@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import SettingService from '@/app/services/SettingService'
+import SettingService from '@/services/SettingService'
 const isNotifiedOnStart = ref(false)
 const settingsPath = ref('')
 const settingService = new SettingService()

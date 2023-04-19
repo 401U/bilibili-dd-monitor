@@ -1,4 +1,4 @@
-import { usePiniaStore } from '@/app/store'
+import { usePiniaStore } from '@/store'
 import type { VtbInfo } from '@/interfaces'
 
 export default class VtbInfoUpdateListener {
