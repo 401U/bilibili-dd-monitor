@@ -29,11 +29,12 @@ import Notifications from '@kyvg/vue3-notification'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { createPinia } from 'pinia'
+import { createRouter, createWebHistory } from 'vue-router'
+import routes from '~pages'
 import { AppUpdateListener, CDNListener, FollowListService, NoticeListener, PlayerWindowCountListener, VtbInfoUpdateListener } from '@/services'
 import OrbitSpinner from '@/components/OrbitSpinner.vue'
 import { slog } from '@/utils/helpers'
 import App from '@/App.vue'
-import router from '@/router'
 
 library.add(
   faSignal,
@@ -60,7 +61,12 @@ const pinia = createPinia()
   @typescript-eslint/no-unsafe-member-access,
 */
 const app = createApp(App)
-  .use(router)
+  .use(
+    createRouter({
+      history: createWebHistory(),
+      routes,
+    }),
+  )
   .use(pinia)
   .use(VueVirtualScroller)
   .component('font-awesome-icon', FontAwesomeIcon)

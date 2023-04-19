@@ -2,15 +2,13 @@
 import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
-import { actionNotify } from '../composables/notify'
+import { actionNotify } from '../../composables/notify'
 import { FollowListService, LivePlayService } from '@/services'
 import { usePiniaStore } from '@/store'
 import FollowListItem from '@/components/FollowListItem.vue'
 import type { FollowList, VtbInfo } from '@/interfaces'
 
-const props = defineProps<{
-  id: string
-}>()
+const props = defineProps<{ id: string }>()
 
 let followListService: FollowListService
 let livePlayService: LivePlayService

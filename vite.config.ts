@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
+import Pages from 'vite-plugin-pages'
 import pkg from './package.json'
 
 export default defineConfig(() => {
@@ -14,6 +15,7 @@ export default defineConfig(() => {
     },
     plugins: [
       vue(),
+      Pages(),
       electron([
         {
           entry: 'electron/main/index.ts',

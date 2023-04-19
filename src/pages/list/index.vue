@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { actionNotify } from '../composables/notify'
+import { actionNotify } from '../../composables/notify'
 import { usePiniaStore } from '@/store'
 import { FollowListService } from '@/services'
 const store = usePiniaStore()
