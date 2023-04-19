@@ -6,8 +6,8 @@ import { BrowserWindow, nativeImage } from 'electron'
 
 import fetch from 'node-fetch'
 import { log } from './utils/logger'
+import type ContextMap from './utils/ContextMap'
 import type { PlayerObj, VtbInfo } from '@/interfaces'
-import type ContextMap from '@/electron/utils/ContextMap'
 const streamPipeline = promisify(pipeline)
 
 function downloadAndSetWindowIcon(vtbInfo: VtbInfo, tempPath: string, win: Electron.BrowserWindow) {
