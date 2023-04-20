@@ -153,17 +153,19 @@ function handleClickCancel() {
 
 // make nav container controlled by flex layout
 .nav-container {
+  border-right: #e2e2e2 solid 1px;
+  min-height: 100vh;
   flex: 0 0 12.5em;
 }
 
 //make fixed nav by position and specific width
 .nav {
+  min-height: 100vh;
   position: fixed;
   width: 12.5em;
 
   &-list {
     list-style: none;
-    border-right: #e2e2e2 solid 1px;
   }
 
   &-list-item {

@@ -119,7 +119,7 @@ watch(vtbInfos, () => {
       :items="filteredVtbInfos"
       :min-item-size="20"
       key-field="mid"
-      style="height: 800px; overflow-y: auto;"
+      style="height: calc(100vh - 85px); overflow-y: auto;"
     >
       <template #default="{ item, index, active }">
         <DynamicScrollerItem
@@ -145,6 +145,7 @@ watch(vtbInfos, () => {
   display: flex;
   flex-direction: row;
   margin-left: 20px;
+  margin-top: 20px;
 
   &-input {
     width: 300px;

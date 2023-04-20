@@ -342,7 +342,7 @@ function handleRenameListModalSuccess() {
           :items="activeFollowedVtbInfos"
           :min-item-size="20"
           key-field="mid"
-          style="height: 700px; overflow-y: auto;"
+          style="height: calc(100vh - 55px); overflow-y: scroll;"
         >
           <template #default="{ item, index, active }">
             <DynamicScrollerItem
