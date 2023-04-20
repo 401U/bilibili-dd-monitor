@@ -78,7 +78,6 @@ export function createPlayerWindow(app: Electron.App, vtbInfo: VtbInfo, playerOb
     })
   // endregion
 
-  // win.webContents.openDevTools()
   win.setMenu(null)
 
   win.on('close', () => {

@@ -341,15 +341,6 @@ app.on('ready', () => {
     },
   ]
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    menuTemplate.push({
-      label: 'DevTools',
-      click: () => {
-        mainWindow.webContents.openDevTools()
-      },
-    })
-  }
-
   const trayMenu = Menu.buildFromTemplate(menuTemplate)
   tray.setToolTip('bilibili-dd-monitor')
   tray.setContextMenu(trayMenu)
