@@ -45,7 +45,7 @@ function handleClickCancel() {
             </router-link>
           </li>
           <li class="nav-list-item">
-            <router-link to="/list" class="nav-list-item-link" :class="{ 'router-link-active': subIsActive('/list') }">
+            <router-link to="/list/-1" class="nav-list-item-link" :class="{ 'router-link-active': subIsActive('/list') }">
               <font-awesome-icon :icon="['fas', 'heart']" class="nav-list-item-icon" />
               关注
             </router-link>
