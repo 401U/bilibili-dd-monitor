@@ -6,6 +6,8 @@ import renderer from 'vite-plugin-electron-renderer'
 import Pages from 'vite-plugin-pages'
 import pkg from './package.json'
 
+const external = Object.keys('dependencies' in pkg ? pkg.dependencies : {})
+
 export default defineConfig(() => {
   return {
     resolve: {
@@ -27,7 +29,7 @@ export default defineConfig(() => {
             build: {
               outDir: 'dist-electron/main',
               rollupOptions: {
-                external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                external,
               },
             },
           },
@@ -41,7 +43,7 @@ export default defineConfig(() => {
             build: {
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                external,
               },
             },
           },
@@ -49,6 +51,5 @@ export default defineConfig(() => {
       ]),
       renderer(),
     ],
-    clearScreen: false,
   }
 })
